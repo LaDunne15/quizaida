@@ -16,11 +16,12 @@ export async function POST(request) {
     if(user) {
         if(bcrypt.compareSync(body.password,user.password)){
             const token = await new SignJWT({
+                id: user._id,
                 email: body.email
             })
             .setProtectedHeader({alg:"HS256"})
             .setIssuedAt()
-            .setExpirationTime("15sec")
+            .setExpirationTime("1day")
             .sign(getJwtSecretKey());
             const response = NextResponse.json({
                 success: true

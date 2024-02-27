@@ -40,6 +40,7 @@ export default function SignUp() {
     }
 
     const sendCode = async () => {
+        
         const code = generateSixDigitCode();
         setTestCode(code);
 

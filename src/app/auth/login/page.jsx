@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useState } from "react";
 import Cookies from "universal-cookie";
@@ -25,7 +26,7 @@ export default function LogIn () {
         })
 
     }
-
+    
     return (
         <form action={logIn}>
             <label htmlFor="email">Email</label>
@@ -34,6 +35,8 @@ export default function LogIn () {
             <input type="password" autoComplete="on" onChange={(e)=>setPassword(e.target.value)}/>
             <input type="submit" value="Log In"/>
             <p>{message}</p>
+            <Link href="/auth/signup">Haven`t account?</Link>
+            
         </form>
     )
 }
