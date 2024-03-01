@@ -8,11 +8,15 @@ const testSchema = mongoose.Schema({
     theme: {
         type: String
     },
+    description: {
+        type: String
+    },
     sourse: [{
         type: String
     }],
     question: [{
-        type: String
+        type: Schema.Types.ObjectId,
+        ref: "Question"
     }],
     created: {
         type: Date,

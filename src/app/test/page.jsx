@@ -1,13 +1,17 @@
 "use client"
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import TestMini from "../../components/testMini";
 
 export default function Tests() {
 
-    const [tests, setTests] = useState();
+    const [tests, setTests] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [message, setMessage] = useState("");
 
     useEffect(() => {
-        fetch('/api/test',{
+        setIsLoading(true);
+        fetch('/api/test/getUsersTest',{
             method: "GET"
         }).then(i=>{
             if(i.ok) {
@@ -16,19 +20,23 @@ export default function Tests() {
                 setMessage(`${i.status} - ${i.statusText}`);
             }
         }).then(result=>{
-            setTests(result);
+            setIsLoading(false);
+            setTests(result.tests);
         });
     },[]);
 
     return (
         <div>
-            Tests
+            <p>My tests</p>
             <Link href="/test/createTest">Create Test</Link>
-            <p>
-                {
-                    JSON.stringify(tests)
+                { 
+                    isLoading?<p>Loading...</p>:<></>
                 }
-            </p>
+                {
+                    !isLoading && tests.map((i,index)=>
+                        <TestMini key={index} data={i}/>
+                    )
+                }
         </div>
     )
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "../../../hooks/useAuth";
+import { redirect } from "next/navigation";
 
 export default function CreateTest() {
 
@@ -10,22 +11,26 @@ export default function CreateTest() {
     const [theme, setTheme] = useState("");
     const [sourses, setSourses] = useState([]);
     const [sourse, setSourse] = useState("");
+    const [description, setDescription] = useState("");
     const [message, setMessage] = useState("");
 
     const createTest = async () => {
         await fetch('/api/test',{
             method: "POST",
             body: JSON.stringify({
-                id: auth.id,
+                author: auth.id,
                 theme,
-                sourses
+                sourses,
+                description
             })
         }).then(i=>{
             if(i.ok) {
-                setMessage(`${i.statusText}`);
+                return i.json();
             } else {
                 setMessage(`${i.status} - ${i.statusText}`);
             }
+        }).then(res=>{
+            redirect(`/test/${res.newTest._id}`);
         });
     }
 
@@ -46,6 +51,10 @@ export default function CreateTest() {
             <p>Creating Test</p>
             <label>Theme</label>
             <input type="text" onChange={(e)=>setTheme(e.target.value)}/>
+            <div>
+                <label>Description</label>
+                <textarea name="" id="" cols="30" rows="10" onChange={(e)=>setDescription(e.target.value)}/>
+            </div>
             <div>
                 <label>Sourses</label>
                 <div>
