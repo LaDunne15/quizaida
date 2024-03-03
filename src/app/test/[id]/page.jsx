@@ -20,7 +20,18 @@ export default function EditTest({params}) {
         theme: "",
         description: "",
         sourse: [""],
-        created: ""
+        created: "",
+        question: [{
+            _id: "",
+            text:"",
+            photo:[""],
+            comment: "",
+            source: "",
+            answer: [{
+                text: "",
+                photo: ""
+            }]
+        }]
     });
     const [message, setMessage] = useState("");
 
@@ -87,6 +98,24 @@ export default function EditTest({params}) {
             <p>
                 Created: {test.created}
             </p>
+            <ul>
+                <p>Questions: </p>
+                {
+                    test.question.map((q)=><li key={q._id}>
+                        <p>{q.text}</p>
+                        <ol>
+                            {
+                                q.answer.map((a,index2)=><li key={index2}>
+                                    <p>{a.text}</p>
+                                    <p>{a.photo}</p>
+                                </li>)
+                            }
+                        </ol>
+                        <a href={q.source}>{q.source}</a>
+                        <i>{q.comment}</i>
+                    </li>)
+                }
+            </ul>
             {
                 message
             }

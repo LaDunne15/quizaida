@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import connect from "../../../libs/db/mongodb";
 import Test from "../../../libs/db/models/test";
 import User from "../../../libs/db/models/user";
+import Question from "../../../libs/db/models/question";
 import { verifyJwtToken } from "../../../libs/auth";
 export const dynamic = 'force-dynamic';
 
@@ -19,6 +20,9 @@ export async function GET(req) {
                 .populate({
                     path: 'author',
                     model: User
+                }).populate({
+                    path: 'question',
+                    model: Question
                 });
                 return NextResponse.json({test},{
                     status: 200,
@@ -50,47 +54,85 @@ export async function GET(req) {
 }
 
 export async function POST(request) {
+
     const body = await request.json();
 
-    const newTest = new Test({
-        author: body.author,
-        theme: body.theme,
-        sourse: body.sourses,
-        description: body.description
-    })
+    try {
+        const createdQuestions = await Question.insertMany(body.questions);
+        const ids = createdQuestions.map(doc => doc._id);
+        const newTest = new Test({
+            author: body.author,
+            theme: body.theme,
+            sourse: body.sourses,
+            description: body.description,
+            question: ids
+        })
 
-    await newTest.save();
+        await newTest.save();
+    
+        return NextResponse.json({ newTest },{
+            status: 201,
+            statusText: "Created"
+        });
 
-    return NextResponse.json({ newTest },{
-        status: 201,
-        statusText: "Created"
-    });
+    } catch (err) {
+        return NextResponse.json({},{
+            status: 400,
+            statusText: `Error ${err}`
+        });
+    }
 }
 
 export async function PUT(req) {
-    const id = req.nextUrl.searchParams.get("id");
-    
-    const body = await req.json();
 
-    const token = await verifyJwtToken(req.cookies.get('token')?.value);
+    try {
+        
+        const id = req.nextUrl.searchParams.get("id");
+        const body = await req.json();    
+        const token = await verifyJwtToken(req.cookies.get('token')?.value);
 
-    if(token) {
-        await Test.findByIdAndUpdate(id, {
-            theme: body.test.theme,
-            sourse: body.test.sourse,
-            description: body.test.description
+        if(token) {
+
+            const test = await Test.findById(id);
+
+            if (test.author.toString() === token.id) {
+
+                const newQuestions = body.question.filter(q=>q._id==="").map((doc)=>{ const { _id, ...obj } = doc; return obj; });
+                const createdQuestions = await Question.insertMany(newQuestions);
+
+                const oldQuestionsIds = body.question.filter(q=>q._id!="").map(doc => doc._id);
+                const newQuestionsIds = createdQuestions.map(doc => doc._id);
+
+                await Test.findByIdAndUpdate(id, {
+                    theme: body.theme,
+                    sourse: body.sourse,
+                    description: body.description,
+                    question: [...oldQuestionsIds,...newQuestionsIds]
+                });
+                return NextResponse.json({},{
+                    status: 200,
+                    statusText: "Updated"
+                });
+
+            } else {
+                return NextResponse.json({},{
+                    status: 403,
+                    statusText: "Forbidden"
+                });
+            }
+        } else {
+            return NextResponse.json({},{
+                status: 401,
+                statusText: "Unauthorized"
+            });
+        }
+
+    } catch (err) {
+        return NextResponse.json({},{
+            status: 400,
+            statusText: `Error ${err}`
         });
-        return NextResponse.json({},{
-            status: 200,
-            statusText: "Updated"
-        })
-    } else {
-        return NextResponse.json({},{
-            status: 401,
-            statusText: "Unauthorized"
-        })
     }
-
 }
 
 export async function DELETE(req) {
