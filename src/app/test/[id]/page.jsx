@@ -34,6 +34,7 @@ export default function EditTest({params}) {
         }]
     });
     const [message, setMessage] = useState("");
+    const [isOwner, setIsOwner] = useState(false);
 
     useEffect(()=>{
         fetch(`/api/test?id=${params.id}`,{
@@ -47,6 +48,7 @@ export default function EditTest({params}) {
         }).then(data=>{
             setIsLoading(false);
             setTest(data.test);
+            setIsOwner(data.isOwner);
         }).catch(err=>{
             console.log(err);
         })
@@ -98,6 +100,8 @@ export default function EditTest({params}) {
             <p>
                 Created: {test.created}
             </p>
+            {
+            /*
             <ul>
                 <p>Questions: </p>
                 {
@@ -116,11 +120,17 @@ export default function EditTest({params}) {
                     </li>)
                 }
             </ul>
+            */
+            }
             {
                 message
             }
-            <Link href={`/test/editTest/${test._id}`}>Edit</Link>
-            <button onClick={deleteTest}>Delete</button>
+            {
+                isOwner && <div>
+                    <Link href={`/test/editTest/${test._id}`}>Edit</Link>
+                    <button onClick={deleteTest}>Delete</button>
+                </div>
+            }
         </div>
     )
 }

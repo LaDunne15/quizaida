@@ -18,6 +18,16 @@ const testSchema = mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "Question"
     }],
+    rating: [{
+        qwewqe:{
+        type: Schema.Types.ObjectId,
+        ref: "User"
+        },
+        kind: {
+            type: String,
+            enum: ["LIKE","DISLIKE"]
+        }
+    }],
     created: {
         type: Date,
         default: Date.now()

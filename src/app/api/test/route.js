@@ -24,7 +24,8 @@ export async function GET(req) {
                     path: 'question',
                     model: Question
                 });
-                return NextResponse.json({test},{
+                const isOwner = test.author._id.toString() === token.id;
+                return NextResponse.json({test,isOwner},{
                     status: 200,
                     statusText: "OK"
                 });
@@ -137,14 +138,36 @@ export async function PUT(req) {
 
 export async function DELETE(req) {
 
-    const id = req.nextUrl.searchParams.get("id");
-
     try {
-        await Test.findByIdAndDelete(id);
-        return NextResponse.json({},{
-            status: 200,
-            statusText: "Deleted"
-        });
+        const id = req.nextUrl.searchParams.get("id");
+        const body = await req.json();    
+        const token = await verifyJwtToken(req.cookies.get('token')?.value);
+
+        if(token) {
+
+            const test = await Test.findById(id);
+
+            if (test.author.toString() === token.id) {
+                await Test.findByIdAndDelete(id);
+                return NextResponse.json({},{
+                    status: 200,
+                    statusText: "Deleted"
+                });
+            } else {
+                return NextResponse.json({},{
+                    status: 403,
+                    statusText: "Forbidden"
+                });
+            }
+            
+        } else {
+            
+            return NextResponse.json({},{
+                status: 401,
+                statusText: "Unauthorized"
+            });
+        }
+
     } catch (err) {
         return NextResponse.json({},{
             status: 400,
