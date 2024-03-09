@@ -1,19 +1,20 @@
 "use client";
 import Link from "next/link";
 import { useAuth } from "./../hooks/useAuth";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Cookies from "universal-cookie";
 
 export default function NavBar() {
 
     const auth = useAuth();
+    const router = useRouter();
 
     const Logout = () => {
         
         const cookies = new Cookies();
         cookies.remove('token');
 
-        redirect("/");
+        router.push("/");
     }
 
     return (
@@ -26,6 +27,9 @@ export default function NavBar() {
                 <>
                     <li>
                         <Link href="/test">Tests</Link>
+                    </li>
+                    <li>
+                        <Link href="/response">Response</Link>
                     </li>
                     <li>
                         <button onClick={Logout}>Log Out</button>

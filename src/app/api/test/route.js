@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import connect from "../../../libs/db/mongodb";
 import Test from "../../../libs/db/models/test";
+import Response from "../../../libs/db/models/response";
 import User from "../../../libs/db/models/user";
 import Question from "../../../libs/db/models/question";
 import { verifyJwtToken } from "../../../libs/auth";
@@ -24,8 +25,20 @@ export async function GET(req) {
                     path: 'question',
                     model: Question
                 });
-                const isOwner = test.author._id.toString() === token.id;
-                return NextResponse.json({test,isOwner},{
+
+                const response = await Response.findOne({
+                    status: "In process",
+                    executor: token.id,
+                    test: id
+                });
+
+                return NextResponse.json({
+                    test,
+                    isOwner: test.author._id.toString() === token.id, 
+                    inProcess: !!response,
+                    responseId: response? response._id: null
+
+                },{
                     status: 200,
                     statusText: "OK"
                 });

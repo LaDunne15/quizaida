@@ -22,6 +22,18 @@ const questionSchema = mongoose.Schema({
     sourse: {
         type: String
     }
-});
+}, {
+    toJSON: {
+        virtuals: true
+    },
+    virtuals: {
+        type: {
+            get() {
+                return this.answer.filter(i=>i.correct===true).length===1?"radio":"checkbox";
+            }
+        }
+    }
+}
+);
 
 export default  mongoose.models.Question || mongoose.model("Question",questionSchema);

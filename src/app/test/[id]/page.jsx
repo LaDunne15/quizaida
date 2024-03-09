@@ -35,6 +35,8 @@ export default function EditTest({params}) {
     });
     const [message, setMessage] = useState("");
     const [isOwner, setIsOwner] = useState(false);
+    const [inProcess, setInProcess] = useState(false);
+    const [responseId, setResponseId] = useState("");
 
     useEffect(()=>{
         fetch(`/api/test?id=${params.id}`,{
@@ -49,6 +51,8 @@ export default function EditTest({params}) {
             setIsLoading(false);
             setTest(data.test);
             setIsOwner(data.isOwner);
+            setInProcess(data.inProcess);
+            setResponseId(data.responseId);
         }).catch(err=>{
             console.log(err);
         })
@@ -71,6 +75,20 @@ export default function EditTest({params}) {
             });
         }
     }
+
+     const startTest = async () => {
+        await fetch(`/api/response?idTest=${test._id}`, {
+            method: "POST"
+        }).then(res=>{
+            if(res.ok) {
+                return res.json();
+            } else {
+                setMessage(`${res.status} - ${res.statusText}`);
+            }
+        }).then((res)=>{
+            router.push(`/response/${res.newResponse._id}`);
+        });
+     }
 
     if(isLoading) {
         return (
@@ -131,6 +149,14 @@ export default function EditTest({params}) {
                     <button onClick={deleteTest}>Delete</button>
                 </div>
             }
+            <div>
+            {
+                inProcess? <>
+                    <p>In process <Link href={`/response/${responseId}`}>Continue</Link></p>
+                </>:
+                <button onClick={startTest}>Start Test</button>
+            }
+            </div>
         </div>
     )
 }

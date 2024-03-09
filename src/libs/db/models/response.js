@@ -15,11 +15,22 @@ const responseSchema = mongoose.Schema({
             ref: "Question"
         },
         answers: [{
-            correct: Boolean,
-            text: String,
-            photo: String
-        }]
+            type: String
+        }],
+        orderNumber: Number
     }],
+    status: {
+        type: String,
+        enum: [
+            'Completed',
+            'In process'
+        ],
+        default: 'In process'
+    },
+    started: {
+        type: Date,
+        default: Date.now()
+    },
     completed: {
         type: Date
     }
