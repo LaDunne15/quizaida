@@ -153,7 +153,6 @@ export async function DELETE(req) {
 
     try {
         const id = req.nextUrl.searchParams.get("id");
-        const body = await req.json();    
         const token = await verifyJwtToken(req.cookies.get('token')?.value);
 
         if(token) {
@@ -161,7 +160,10 @@ export async function DELETE(req) {
             const test = await Test.findById(id);
 
             if (test.author.toString() === token.id) {
-                await Test.findByIdAndDelete(id);
+
+                await Test.findByIdAndDelete( id );
+                await Response.deleteMany({ test:id });
+
                 return NextResponse.json({},{
                     status: 200,
                     statusText: "Deleted"

@@ -31,6 +31,7 @@ export default function NavBar() {
                     <li>
                         <Link href="/response">Response</Link>
                     </li>
+                    <li>{auth.email}</li>
                     <li>
                         <button onClick={Logout}>Log Out</button>
                     </li>

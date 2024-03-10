@@ -39,11 +39,32 @@ export async function GET(req) {
                         path: 'question'
                     }
                 });
-    
-                return NextResponse.json({
-                    response,
-                    isCompleted: false
-                });
+
+                if(response.status==="Completed") {
+                    const result = response.answers.sort((a,b)=>{return (a.orderNumber-b.orderNumber);}).map(i=>{
+
+                        var _res;
+                        if(i.question.type==="radio") {
+                            _res = i.question.correctAnswers[0].id === i.answers[0]?1:0;
+                        } else {
+                            const ans = i.question.answer.map(i=>({correct:i.correct,id:i.id}));
+                            const ans2 = i.answers;
+                            const res = ans.map(i=>i.correct?(ans2.includes(i.id)?1:0):(!ans2.includes(i.id)?1:0));
+                            _res = res.reduce((acc,val) => acc + val)/res.length;
+                        }
+                        return {...i.toObject(), rating: _res};
+                    });
+            
+                    return NextResponse.json({
+                        response: {...response.toObject(), answers: result},
+                        isCompleted: false
+                    });
+                } else {
+                    return NextResponse.json({
+                        response,
+                        isCompleted: false
+                    });
+                }
     
             } else {
                 const response = await Response.find({
@@ -174,7 +195,6 @@ export async function PUT(req) {
                 response,
                 isCompleted: false
             });
-    
 
         } else {
 

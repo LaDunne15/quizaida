@@ -26,10 +26,18 @@ const questionSchema = mongoose.Schema({
     toJSON: {
         virtuals: true
     },
+    toObject: {
+        virtuals: true
+    },
     virtuals: {
         type: {
             get() {
                 return this.answer.filter(i=>i.correct===true).length===1?"radio":"checkbox";
+            }
+        },
+        correctAnswers: {
+            get() {
+                return this.answer.filter(i=>i.correct===true);
             }
         }
     }

@@ -9,12 +9,15 @@ export default function Response ({params}) {
         status: "",
         test: {
             theme: "",
+            description: "",
+            sourse: "",
             question: [{
                 id: "",
                 text: "",
                 type: "",
                 answer: [{
                     id: "",
+                    correct: false,
                     text: "",
                     photo: ""
                 }]
@@ -27,14 +30,17 @@ export default function Response ({params}) {
                 type: "",
                 answer: [{
                     id: "",
+                    correct: false,
                     text: "",
                     photo: ""
                 }]
             },
             answers: [],
-            orderNumber: 0
+            orderNumber: 0,
+            rating: 0
         }]
     });
+    const [message, setMessage] = useState("");
 
     useEffect(()=>{
         fetch(`/api/response?id=${params.id}`,{
@@ -43,7 +49,7 @@ export default function Response ({params}) {
             if(res.ok) {
                 return res.json();
             } else {
-                //setMessage(`${res.status} - ${res.statusText}`);
+                setMessage(`${res.status} - ${res.statusText}`);
             }
         }).then(data=>{
             setResponse(data.response);
@@ -51,7 +57,20 @@ export default function Response ({params}) {
         });
     },[]);
 
-    const sendResult = () => {
+    const sendResult = async () => {
+
+        fetch(`/api/response/complete?id=${params.id}`,{
+            method: "POST"
+        }).then(res=>{
+            if(res.ok) {
+                return res.json();
+            } else {
+                setMessage(`${res.status} - ${res.statusText}`);
+            }
+        }).then(data=>{
+            setResponse(data.response);
+        });
+
     }
 
     const answerTheQuestion = (q, a, orderNumber) => {
@@ -79,10 +98,9 @@ export default function Response ({params}) {
             if(res.ok) {
                 return res.json();
             } else {
-                //setMessage(`${res.status} - ${res.statusText}`);
+                setMessage(`${res.status} - ${res.statusText}`);
             }
         }).then(data=>{
-            console.log(data);
         });
 
     }
@@ -102,15 +120,35 @@ export default function Response ({params}) {
 
     return (
         <div>
+            <h1>{response.test.theme}</h1>
+            <h6>{response.status}</h6>
             {
                 response.status==="Completed" && <div>
-                    <h1>{response.test.theme}</h1>
-                    Completed
+                    <div>
+                        <p>{response.test.description}</p>
+                    <h2>Total: {(response.answers.map(i=>i.rating).reduce((acc,val) => acc + val)/response.answers.length*100).toFixed(0)} %</h2>
+                    <ol>
+                    {
+                        response.answers.sort((a,b)=>{return (a.orderNumber-b.orderNumber);}).map((i)=><li key={i.orderNumber}>
+                            <p>{i.question.text} ({i.rating.toFixed(2)})</p>
+                            <ul style={{listStyleType: "none"}}>
+                            {
+                                i.question.answer.map(j=><li key={j.id}>
+                                    <input type={i.question.type} name={i.question.id} value={j.id} checked={isChecked(j,i.answers)} disabled/>
+                                    <span>{j.text} { j.correct && 
+                                        <b>Correct</b>
+                                    }</span>
+                                </li>)
+                            }
+                            </ul>
+                        </li>)
+                    }
+                    </ol>
+                    </div>
                 </div>
             }
             {
                 !isLoading && response.status==="In process" && <form action={sendResult}>
-                    <h1>{response.test.theme}</h1>
                     <ol>
                     {
                         response.answers.sort((a,b)=>{return (a.orderNumber-b.orderNumber);}).map((i)=><li key={i.orderNumber}>
@@ -126,24 +164,10 @@ export default function Response ({params}) {
                         </li>)
                     }
                     </ol>
-                    
-                    <ol>
                     {
-                        /*
-                        response.test.question.map((i)=><li key={i._id}>
-                            <p>{i.text}</p>
-                            <ul style={{listStyleType: "none"}}>
-                            {
-                                i.answer.map(j=><li key={j.id}>
-                                    <input type={i.type} name={i.id} value={j.id} onChange={()=>{answerTheQuestion(i,j)}}/>
-                                    <span>{j.text}</span>
-                                </li>)
-                            }
-                            </ul>
-                        </li>)*/
+                        message
                     }
-                    </ol>
-                    <input type="submit" value="Send Result"/>
+                    <input type="submit" value="Complete"/>
                 </form>
             }
         </div>

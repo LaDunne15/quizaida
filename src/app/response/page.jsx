@@ -1,5 +1,6 @@
 "use client";
 
+import { set } from "mongoose";
 import Link from "next/link";
 import { useEffect, useState } from "react"
 
@@ -9,8 +10,12 @@ export default function Response () {
         _id: "",
         test: {
             theme: ""
-        }
+        },
+        status: "",
+        started: "",
+        completed: ""
     }]);
+    const [message, setMessage] = useState("");
 
     useEffect(()=>{
         fetch(`/api/response`,{
@@ -19,9 +24,10 @@ export default function Response () {
             if(res.ok) {
                 return res.json();
             } else {
-                //setMessage(`${res.status} - ${res.statusText}`);
+                setMessage(`${res.status} - ${res.statusText}`);
             }
         }).then(data=>{
+            console.log(data);
             setResponses(data.response);
         });
     },[]);
@@ -31,10 +37,18 @@ export default function Response () {
         <div>
             {   
                 responses.map((i)=><div key={i._id}>
-                    <Link href={`response/${i._id}`}>{i.test.theme}</Link>
+                    {
+                        i.test?<div>
+                            <Link href={`response/${i._id}`}>{i.test.theme}</Link>
+                            <span>{i.status} {i.started}</span>
+                        </div>:
+                        <div>No Data</div>
+                    }
                 </div>)
             }
-            
+            {
+                message
+            }
         </div>
     )
 }
