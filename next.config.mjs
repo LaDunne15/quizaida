@@ -10,6 +10,18 @@ const nextConfig = {
         };
         return config;
     },
+    images: {
+        remotePatterns: [{
+            protocol: "https",
+            hostname: "quizaida.s3.eu-north-1.amazonaws.com",
+            port: "",
+            pathname: "/**"
+        }],
+        /*
+        domains: [
+            "quizaida.s3.eu-north-1.amazonaws.com"
+        ]*/
+    }
 };
 
 export default nextConfig;

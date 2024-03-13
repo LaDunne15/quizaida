@@ -27,7 +27,6 @@ export default function Response () {
                 setMessage(`${res.status} - ${res.statusText}`);
             }
         }).then(data=>{
-            console.log(data);
             setResponses(data.response);
         });
     },[]);
@@ -40,7 +39,7 @@ export default function Response () {
                     {
                         i.test?<div>
                             <Link href={`response/${i._id}`}>{i.test.theme}</Link>
-                            <span>{i.status} {i.started}</span>
+                            <span>{i.status} {i.started} - {i.completed}</span>
                         </div>:
                         <div>No Data</div>
                     }
