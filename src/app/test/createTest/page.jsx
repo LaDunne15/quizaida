@@ -1,8 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../../hooks/useAuth";
 import { redirect } from "next/navigation";
+import SingleImage from "../../../components/images/singleImage";
+import Image from "next/image";
+import Link from "next/link";
+import { v4 as uuidv4 } from 'uuid';
 
 export default function CreateTest() {
 
@@ -16,20 +20,17 @@ export default function CreateTest() {
 
     const clearQuestion = {
         text: "",
-        photo: [""],
-        answer: [{
-            correct: false,
-            text: "",
-            photo: ""
-        }],
+        photo: [],
+        answer: [],
         comment: "",
         sourse: ""
     }
 
     const [question, setQuestion] = useState(clearQuestion)
-    const [questions, setQuestions] = useState([clearQuestion]);
+    const [questions, setQuestions] = useState([]);
 
     const [photo, setPhoto] = useState("");
+    const [images, setImages] = useState([]);
     const [answer, setAnswer] = useState({
         correct: false,
         text: "",
@@ -58,16 +59,34 @@ export default function CreateTest() {
     }
 
     const createTest = async () => {
+
+        let formData = new FormData();
+
+        const _questions = questions.map((i)=>{
+            const photo = i.photo.map(j=>{
+                const idPhoto = uuidv4();
+                formData.append(`${idPhoto}`,j);
+                return idPhoto;
+            });
+            const answer = i.answer.map(j=>{
+                const idPhoto = uuidv4();
+                formData.append(`${idPhoto}`,j.photo);
+                return {...j, photo: idPhoto}
+            });
+            return {...i, photo, answer };
+        });
+
+        formData.append('test', JSON.stringify({
+            author: auth.id,
+            theme,
+            sourses,
+            description,
+            questions: _questions
+        }));
         
         await fetch('/api/test',{
             method: "POST",
-            body: JSON.stringify({
-                author: auth.id,
-                theme,
-                sourses,
-                description,
-                questions
-            })
+            body: formData
         }).then(i=>{
             if(i.ok) {
                 return i.json();
@@ -97,6 +116,10 @@ export default function CreateTest() {
     const removeSourse = (_sourse) => {
         setSourses([...sourses.filter(el=>el!=_sourse)])
     }
+
+    useEffect(()=>{
+        setQuestion({...question,photo:[...images]});
+    },[images]);
     
     return (
         <form action={createTest}>
@@ -135,40 +158,81 @@ export default function CreateTest() {
                     </div>
                     <div>
                         <label>Photos:</label>
-                        <input type="text" name="" id="" onChange={(e)=>setPhoto(e.target.value)}/>
-                        <input type="button" value="Add Photo" onClick={(e)=>setQuestion({...question,photo:[...question.photo,photo]})}/>
+                        <input type="file" name="" id="" onChange={(e) => setImages([...images, e.target.files[0]])}/>
                         <div>
                             {
-                                question.photo.map((s,index)=>
-                                <p key={index}>
-                                    <span>{s}</span>
-                                    <input type="button" value="X" onClick={() =>{setQuestion({...question,photo:[...question.photo.filter(el=>el!=s)]})}}/>
-                                </p>)
+                                
+                                question.photo.map((i,index)=><div key={index}>
+                                    <Image
+                                    style={{
+                                        objectFit: "cover"
+                                    }}
+                                    src={URL.createObjectURL(i)}
+                                    alt="Downloaded"
+                                    width={100}
+                                    height={100}
+                                    />
+                                    <input type="button" value="X" onClick={() =>{setImages([...question.photo.filter(el=>el!=i)])}}/>
+                                </div>)
                             }
                         </div>
                     </div>
                     <div>
                         <label>Answers:</label>
                         <div>
-                            Text:
+                            <p>Text:</p>
                             <input type="text" name="" id="" onChange={(e)=>setAnswer({...answer,text:e.target.value})}/>
                         </div>
                         <div>
-                            Photo:
-                            <input type="text" name="" id="" onChange={(e)=>setAnswer({...answer,photo:e.target.value})}/>
+                            <p>Photo:</p>
+                            <input type="file" name="" id="" onChange={(e) => setAnswer({...answer, photo:e.target.files[0]})}/>
+                            {
+                                answer.photo && <Image
+                                    style={{
+                                        objectFit: "cover"
+                                    }}
+                                    src={URL.createObjectURL(answer.photo)}
+                                    alt="Downloaded"
+                                    width={100}
+                                    height={100}
+                                />
+                            }
                         </div>
                         <div>
-                            Correct:
+                            <p>Correct:
                             <input type="checkbox" name="" id="" onChange={(e)=>setAnswer({...answer,correct:e.target.checked})}/>
+                            </p>
                         </div>
                         <input type="button" value="Add Answer" onClick={(e)=>setQuestion({...question,answer:[...question.answer,answer]})}/>                        
                         <div>
                             {
+                                question.answer.map((a, index) => <li key={index}>
+                                    <h5>{a.text}</h5>
+                                    <input type="checkbox" name="" id="" checked={a.correct} disabled={true}/>
+                                    {
+                                        a.photo && <Image
+                                        style={{
+                                            objectFit: "cover"
+                                        }}
+                                        src={URL.createObjectURL(a.photo)}
+                                        alt="Downloaded"
+                                        width={100}
+                                        height={100}
+                                    />
+                                    }
+                                    <input type="button" value="X" 
+                                        onClick={() =>{
+                                            setQuestion({...question,answer:[...question.answer.filter(el=>el!==a)]})
+                                        }} 
+                                    />
+                                </li>)
+                                /*
                                 question.answer.map((s,index)=>
                                 <p key={index}>
                                     <span>{s.correct.toString()} {s.text} {s.photo}</span>
                                     <input type="button" value="X" onClick={() =>{setQuestion({...question,answer:[...question.answer.filter(el=>el!==s)]})}} />
                                 </p>)
+                                */
                             }
                         </div>
                     </div>
@@ -181,13 +245,48 @@ export default function CreateTest() {
                         <input type="text" name="" id="" onChange={(e)=>setQuestion({...question,sourse:e.target.value})}/>
                     </div>
                     <input type="button" value="Add Question" onClick={addQuestion}/>
+                    <ul>
                     {
                         questions.map((s,index)=>
-                            <p key={index}>
-                                <span>{s.text}</span>
+                            <li key={index}>
+                                <h5>{s.text}</h5>
+                                {
+                                    s.photo.map((i,index2)=><Image
+                                    key={index2}
+                                    style={{
+                                        objectFit: "cover"
+                                    }}
+                                    src={URL.createObjectURL(i)}
+                                    alt="Downloaded"
+                                    width={100}
+                                    height={100}
+                                    />)
+                                }
+                                <ul>
+                                    {
+                                        s.answer.map((a,index3)=><li key={index3}>
+                                            <h5>{a.text}</h5>
+                                            <input type="checkbox" name="" id="" checked={a.correct} disabled={true}/>
+                                            {
+                                                a.photo && <Image
+                                                style={{
+                                                objectFit: "cover"
+                                                }}
+                                                src={URL.createObjectURL(a.photo)}
+                                                alt="Downloaded"
+                                                width={100}
+                                                height={100}
+                                                />
+                                            }
+                                        </li>)
+                                    }
+                                </ul>
+                                <p><i>{s.comment}</i></p>
+                                <Link href={s.sourse}>{s.sourse}</Link>
                                 <input type="button" value="X" onClick={() =>{setQuestions([...questions.filter(el=>el!=s)])}}/>
-                            </p>)
+                            </li>)
                     }
+                    </ul>
                 </div>
             </div>
             {

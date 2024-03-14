@@ -4,10 +4,8 @@ import { NextResponse } from "next/server";
 
 class AWSService {
 
-    async uploadFile(file) {
+    async uploadFile(file, filename) {
         const buffer = Buffer.from(await file.arrayBuffer());
-        const fileExtension = file.name.split('.').pop();
-        const filename = `${uuidv4()}.${fileExtension}`;
 
         AWS.config.update({
             accessKeyId: process.env.ACCESS_KEY_ID,

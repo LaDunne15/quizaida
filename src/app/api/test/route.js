@@ -5,6 +5,7 @@ import Response from "../../../libs/db/models/response";
 import User from "../../../libs/db/models/user";
 import Question from "../../../libs/db/models/question";
 import { verifyJwtToken } from "../../../libs/auth";
+import { awsService } from "../../../libs/awsService";
 export const dynamic = 'force-dynamic';
 
 connect();
@@ -69,18 +70,41 @@ export async function GET(req) {
 
 export async function POST(request) {
 
-    const body = await request.json();
 
     try {
-        const createdQuestions = await Question.insertMany(body.questions);
+        
+        const formData = await request.formData();
+        const file = JSON.parse(formData.get('test'));
+
+        const questions = file.questions.map((i)=>{
+
+            const photo = i.photo.map((p)=>{
+                const _file = formData.get(p);
+                const filename = `${p}.${_file.name.split('.').pop()}` 
+                awsService.uploadFile(_file, filename);
+                return filename;
+            });
+
+            const answer = i.answer.map(j=>{
+                const _file = formData.get(j.photo);
+                const filename = `${j.photo}.${_file.name.split('.').pop()}`
+                awsService.uploadFile(_file, filename);
+                return {...j, photo: filename}
+            });
+
+            return {...i, photo, answer };
+        });
+
+        const createdQuestions = await Question.insertMany(questions);
         const ids = createdQuestions.map(doc => doc._id);
+
         const newTest = new Test({
-            author: body.author,
-            theme: body.theme,
-            sourse: body.sourses,
-            description: body.description,
+            author: file.author,
+            theme: file.theme,
+            sourse: file.sourses,
+            description: file.description,
             question: ids
-        })
+        });
 
         await newTest.save();
     
@@ -90,6 +114,7 @@ export async function POST(request) {
         });
 
     } catch (err) {
+
         return NextResponse.json({},{
             status: 400,
             statusText: `Error ${err}`
