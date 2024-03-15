@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react"
 
 export default function Response ({params}) {
@@ -14,6 +15,7 @@ export default function Response ({params}) {
             question: [{
                 id: "",
                 text: "",
+                photo: [],
                 type: "",
                 answer: [{
                     id: "",
@@ -28,12 +30,15 @@ export default function Response ({params}) {
                 id: "",
                 text: "",
                 type: "",
+                photo: [],
                 answer: [{
                     id: "",
                     correct: false,
                     text: "",
                     photo: ""
-                }]
+                }],
+                comment: "",
+                sourse: ""
             },
             answers: [],
             orderNumber: 0,
@@ -131,16 +136,34 @@ export default function Response ({params}) {
                     {
                         response.answers.sort((a,b)=>{return (a.orderNumber-b.orderNumber);}).map((i)=><li key={i.orderNumber}>
                             <p>{i.question.text} ({i.rating.toFixed(2)})</p>
+                            {
+                                i.question.photo.map(j=>
+                                    <Image key={j}
+                                        style={{
+                                            objectFit: "cover"
+                                        }}
+                                        src={j}
+                                        alt="Downloaded"
+                                        width={100}
+                                        height={100}
+                                    />
+                                )
+                            }
                             <ul style={{listStyleType: "none"}}>
                             {
                                 i.question.answer.map(j=><li key={j.id}>
                                     <input type={i.question.type} name={i.question.id} value={j.id} checked={isChecked(j,i.answers)} disabled/>
+                                    {
+                                        j.photo && <Image src={j.photo} alt="Downloaded" width={100} height={100} style={{objectFit: "cover"}}/>
+                                    }
                                     <span>{j.text} { j.correct && 
                                         <b>Correct</b>
                                     }</span>
                                 </li>)
                             }
                             </ul>
+                            <p><i>{i.question.comment}</i></p>
+                            <p>{i.question.sourse}</p>
                         </li>)
                     }
                     </ol>
@@ -153,11 +176,27 @@ export default function Response ({params}) {
                     {
                         response.answers.sort((a,b)=>{return (a.orderNumber-b.orderNumber);}).map((i)=><li key={i.orderNumber}>
                             <p>{i.question.text}</p>
+                            {
+                                i.question.photo.map(j=>
+                                    <Image key={j}
+                                        style={{
+                                            objectFit: "cover"
+                                        }}
+                                        src={j}
+                                        alt="Downloaded"
+                                        width={100}
+                                        height={100}
+                                    />
+                                )
+                            }
                             <ul style={{listStyleType: "none"}}>
                             {
                                 i.question.answer.map(j=><li key={j.id}>
                                     <input type={i.question.type} name={i.question.id} value={j.id} onChange={()=>{answerTheQuestion(i.question,j, i.orderNumber)}} checked={isChecked(j,i.answers)}/>
                                     <span>{j.text}</span>
+                                    {
+                                        j.photo && <Image src={j.photo} alt="Downloaded" width={100} height={100} style={{objectFit: "cover"}}/>
+                                    }
                                 </li>)
                             }
                             </ul>
@@ -170,6 +209,11 @@ export default function Response ({params}) {
                     <input type="submit" value="Complete"/>
                 </form>
             }
+            <pre>
+                {
+                    //JSON.stringify(response, null, 2)
+                }
+            </pre>
         </div>
     )
 }

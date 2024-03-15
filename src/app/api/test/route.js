@@ -70,7 +70,6 @@ export async function GET(req) {
 
 export async function POST(request) {
 
-
     try {
         
         const formData = await request.formData();
@@ -80,16 +79,19 @@ export async function POST(request) {
 
             const photo = i.photo.map((p)=>{
                 const _file = formData.get(p);
+                if (!_file) return "";
+
                 const filename = `${p}.${_file.name.split('.').pop()}` 
                 awsService.uploadFile(_file, filename);
-                return filename;
+                return awsService.getFileLink(filename);
             });
 
             const answer = i.answer.map(j=>{
                 const _file = formData.get(j.photo);
+                if (!_file) return {...j, photo: ""};
                 const filename = `${j.photo}.${_file.name.split('.').pop()}`
                 awsService.uploadFile(_file, filename);
-                return {...j, photo: filename}
+                return {...j, photo: awsService.getFileLink(filename)}
             });
 
             return {...i, photo, answer };
@@ -106,9 +108,9 @@ export async function POST(request) {
             question: ids
         });
 
-        await newTest.save();
+        const result = await newTest.save();
     
-        return NextResponse.json({ newTest },{
+        return NextResponse.json({ newTest: result },{
             status: 201,
             statusText: "Created"
         });

@@ -34,6 +34,7 @@ export default function EditTest({params}) {
     const [sourse, setSourse] = useState("");
 
     
+    const [images, setImages] = useState([]);
     const [question, setQuestion] = useState(clearQuestion)
     const [questions, setQuestions] = useState([clearQuestion]);
 
@@ -84,6 +85,7 @@ export default function EditTest({params}) {
         }).then(data=>{
             setIsLoading(false);
             setTest(data.test);
+            setImages(data.test)
             setQuestions(data.test.question);
         })
     },[]);
@@ -115,6 +117,11 @@ export default function EditTest({params}) {
     const removeSourse = (_sourse) => {
         setTest({...test,sourse:[...test.sourse.filter(el=>el!=_sourse)]});
     }
+
+    useEffect(()=>{
+        //setQuestion({...question,photo:[...images]});
+        setTest({...test, question: {...test.question, photo:[...images]}});
+    },[images]);
 
     if(isLoading) {
         return (
@@ -162,8 +169,9 @@ export default function EditTest({params}) {
                     </div>
                     <div>
                         <label>Photos:</label>
-                        <input type="text" name="" id="" onChange={(e)=>setPhoto(e.target.value)}/>
-                        <input type="button" value="Add Photo" onClick={(e)=>setQuestion({...question,photo:[...question.photo,photo]})}/>
+                        <input type="file" name="" id="" onChange={(e) => {
+                            if (e.target.files.length) setImages([...images, e.target.files[0]])
+                        }}/>
                         <div>
                             {
                                 question.photo.map((s,index)=>
@@ -235,6 +243,11 @@ export default function EditTest({params}) {
             {
                 message
             }
+            <pre>
+                {
+                    JSON.stringify(test, null, 2)
+                }
+            </pre>
             <input type="submit" value="Save Changes"/>
         </form>
     )

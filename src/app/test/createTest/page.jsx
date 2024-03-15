@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../hooks/useAuth";
 import { redirect } from "next/navigation";
-import SingleImage from "../../../components/images/singleImage";
 import Image from "next/image";
 import Link from "next/link";
 import { v4 as uuidv4 } from 'uuid';
@@ -94,6 +93,7 @@ export default function CreateTest() {
                 setMessage(`${i.status} - ${i.statusText}`);
             }
         }).then(res=>{
+            //console.log(res);
             redirect(`/test/${res.newTest._id}`);
         });
     }
@@ -158,7 +158,9 @@ export default function CreateTest() {
                     </div>
                     <div>
                         <label>Photos:</label>
-                        <input type="file" name="" id="" onChange={(e) => setImages([...images, e.target.files[0]])}/>
+                        <input type="file" name="" id="" onChange={(e) => {
+                            if (e.target.files.length) setImages([...images, e.target.files[0]])
+                        }}/>
                         <div>
                             {
                                 
@@ -185,7 +187,10 @@ export default function CreateTest() {
                         </div>
                         <div>
                             <p>Photo:</p>
-                            <input type="file" name="" id="" onChange={(e) => setAnswer({...answer, photo:e.target.files[0]})}/>
+                            <input type="file" name="" id="" onChange={(e) => {
+                                if(e.target.files.length) setAnswer({...answer, photo:e.target.files[0]});
+                            }
+                            }/>
                             {
                                 answer.photo && <Image
                                     style={{
