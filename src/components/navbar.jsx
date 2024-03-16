@@ -18,6 +18,7 @@ export default function NavBar() {
     }
 
     return (
+        <nav>
         <ul>
             <li>
                 <Link href="/">Main</Link>
@@ -31,7 +32,9 @@ export default function NavBar() {
                     <li>
                         <Link href="/response">Response</Link>
                     </li>
-                    <li>{auth.email}</li>
+                    <li>
+                        <Link href="/user">{auth.email}</Link>
+                    </li>
                     <li>
                         <button onClick={Logout}>Log Out</button>
                     </li>
@@ -50,5 +53,6 @@ export default function NavBar() {
                 }*/
             }
         </ul>
+        </nav>
     )
 }

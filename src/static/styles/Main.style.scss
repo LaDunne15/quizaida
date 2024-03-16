@@ -1,0 +1,27 @@
+
+@import "./reset.css";
+
+.app {
+    display: flex;
+    flex-direction: column;
+    background-color: #c7f0d8;
+    min-height: 100vh;
+
+    nav {
+        background-color: #43523d;
+        color: #c7f0d8;
+    }
+
+    main {
+        flex: 1;
+        color: #43523d;
+    }
+
+    footer {
+        background-color: #43523d;
+        color: #abf33a;
+    }
+}
+
+
+

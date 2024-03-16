@@ -128,32 +128,58 @@ export async function PUT(req) {
 
     try {
         
-        const id = req.nextUrl.searchParams.get("id");
-        const body = await req.json();    
         const token = await verifyJwtToken(req.cookies.get('token')?.value);
 
         if(token) {
 
+            const id = req.nextUrl.searchParams.get("id");
             const test = await Test.findById(id);
 
             if (test.author.toString() === token.id) {
 
-                const newQuestions = body.question.filter(q=>q._id==="").map((doc)=>{ const { _id, ...obj } = doc; return obj; });
+                const formData = await req.formData();
+                const test = JSON.parse(formData.get('test'));
+
+                
+                const newQuestions = test.question.filter(q=>q._id==="")
+                    .map((doc)=>{ 
+                        const { _id, ...obj } = doc; 
+                        const photo = obj.photo.map((p)=>{
+                            const _file = formData.get(p);
+                            if (!_file) return "";
+            
+                            const filename = `${p}.${_file.name.split('.').pop()}` 
+                            awsService.uploadFile(_file, filename);
+                            return awsService.getFileLink(filename);
+                        });
+            
+                        const answer = obj.answer.map(j=>{
+                            const _file = formData.get(j.photo);
+                            if (!_file) return {...j, photo: ""};
+                            const filename = `${j.photo}.${_file.name.split('.').pop()}`
+                            awsService.uploadFile(_file, filename);
+                            return {...j, photo: awsService.getFileLink(filename)}
+                        });
+            
+                        return {...obj, photo, answer };
+                    });
+                    
                 const createdQuestions = await Question.insertMany(newQuestions);
 
-                const oldQuestionsIds = body.question.filter(q=>q._id!="").map(doc => doc._id);
+                const oldQuestionsIds = test.question.filter(q=>q._id!="").map(doc => doc._id);
                 const newQuestionsIds = createdQuestions.map(doc => doc._id);
-
+                
                 await Test.findByIdAndUpdate(id, {
-                    theme: body.theme,
-                    sourse: body.sourse,
-                    description: body.description,
+                    theme: test.theme,
+                    sourse: test.sourse,
+                    description: test.description,
                     question: [...oldQuestionsIds,...newQuestionsIds]
                 });
+
                 return NextResponse.json({},{
                     status: 200,
                     statusText: "Updated"
-                });
+                }); 
 
             } else {
                 return NextResponse.json({},{

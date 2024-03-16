@@ -21,6 +21,9 @@ const nextConfig = {
         domains: [
             "quizaida.s3.eu-north-1.amazonaws.com"
         ]*/
+    },
+    sassOptions: {
+        includePaths: ["./styles"],
     }
 };
 
