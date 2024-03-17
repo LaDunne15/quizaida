@@ -3,6 +3,10 @@ import Link from "next/link";
 import { useAuth } from "./../hooks/useAuth";
 import { redirect, useRouter } from "next/navigation";
 import Cookies from "universal-cookie";
+import Image from "next/image";
+
+import questionIcon from "../static/icons/question.png";
+import QIcon from "../static/icons/Q.png";
 
 export default function NavBar() {
 
@@ -19,40 +23,51 @@ export default function NavBar() {
 
     return (
         <nav>
-        <ul>
-            <li>
-                <Link href="/">Main</Link>
-            </li>
+            <span className="logo">
+                <Link href="/">
+                    <div>
+                        <Image priority src={QIcon} width={30} height={30}/>
+                    </div>
+                    <span>uizaida</span>
+                </Link>
+            </span>
             {
                 auth &&
-                <>
+                <ul>
                     <li>
-                        <Link href="/test">Tests</Link>
+                        <Link href="/test">
+                            <div>
+                                <Image priority src={questionIcon} width={30} height={30}/>
+                            </div>
+                            <span>Tests</span>
+                        </Link>
                     </li>
                     <li>
-                        <Link href="/response">Response</Link>
+                        <Link href="/response">
+                            <div>
+                                <Image priority src={questionIcon} width={30} height={30}/>
+                            </div>
+                            <span>Response</span>
+                        </Link>
                     </li>
                     <li>
-                        <Link href="/user">{auth.email}</Link>
+                        <Link href="/user">
+                            <div>
+                                <Image priority src={questionIcon} width={30} height={30}/>
+                            </div>
+                            <span>Account</span>
+                        </Link>
                     </li>
                     <li>
-                        <button onClick={Logout}>Log Out</button>
+                        <button onClick={Logout}>
+                            <div>
+                                <Image priority src={questionIcon} width={30} height={30}/>
+                            </div>
+                            <span>Log Out</span>
+                        </button>
                     </li>
-                </>
-                /*
-                { 
-                    false &&
-                    <>
-                        <li>
-                            <Link href="/auth/signup">Sign Up</Link>
-                        </li>
-                        <li>
-                            <Link href="/auth/login">Log In</Link>
-                        </li>
-                    </>
-                }*/
+                </ul>
             }
-        </ul>
         </nav>
     )
 }
