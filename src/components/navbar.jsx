@@ -26,7 +26,7 @@ export default function NavBar() {
             <span className="logo">
                 <Link href="/">
                     <div>
-                        <Image priority src={QIcon} width={30} height={30}/>
+                        <Image priority src={QIcon} width={30} height={30} alt="Quizaida"/>
                     </div>
                     <span>uizaida</span>
                 </Link>
@@ -37,7 +37,7 @@ export default function NavBar() {
                     <li>
                         <Link href="/test">
                             <div>
-                                <Image priority src={questionIcon} width={30} height={30}/>
+                                <Image priority src={questionIcon} width={30} height={30} alt="Tests"/>
                             </div>
                             <span>Tests</span>
                         </Link>
@@ -45,7 +45,7 @@ export default function NavBar() {
                     <li>
                         <Link href="/response">
                             <div>
-                                <Image priority src={questionIcon} width={30} height={30}/>
+                                <Image priority src={questionIcon} width={30} height={30} alt="Response"/>
                             </div>
                             <span>Response</span>
                         </Link>
@@ -53,7 +53,7 @@ export default function NavBar() {
                     <li>
                         <Link href="/user">
                             <div>
-                                <Image priority src={questionIcon} width={30} height={30}/>
+                                <Image priority src={questionIcon} width={30} height={30} alt="Account"/>
                             </div>
                             <span>Account</span>
                         </Link>
@@ -61,7 +61,7 @@ export default function NavBar() {
                     <li>
                         <button onClick={Logout}>
                             <div>
-                                <Image priority src={questionIcon} width={30} height={30}/>
+                                <Image priority src={questionIcon} width={30} height={30} alt="Log Out"/>
                             </div>
                             <span>Log Out</span>
                         </button>

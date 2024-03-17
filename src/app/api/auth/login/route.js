@@ -3,10 +3,47 @@ import connectDB from "../../../../libs/db/mongodb";
 import User from "../../../../libs/db/models/user";
 import bcrypt from "bcrypt";
 import { SignJWT } from "jose";
-import { getJwtSecretKey } from "../../../../libs/auth";
+import { getJwtSecretKey, verifyJwtToken } from "../../../../libs/auth";
 export const dynamic = 'force-dynamic' // defaults to auto
 
 connectDB();
+
+export async function GET(req) {
+
+    try {
+
+        const token = await verifyJwtToken(req.cookies.get('token')?.value);
+
+        if (token) {
+
+            const user = await User.findById(token.id);
+
+            return NextResponse.json({
+                user
+            }, {
+                status: 200,
+                headers: { "content-type": "application/json" }
+            });
+
+        } else {
+
+            return NextResponse.json({
+                success: "Є контанк"
+            }, {
+                status: 200,
+                headers: { "content-type": "application/json" }
+            });
+
+        }
+    } catch (err) {
+
+        return NextResponse.json({}, {
+            status: 400,
+            statusText: `Error ${err}`
+        });
+
+    }
+}
 
 export async function POST(request) {
 

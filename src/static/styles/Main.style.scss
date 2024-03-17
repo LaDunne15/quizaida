@@ -9,8 +9,11 @@
 
     nav {
         background-color: #43523d;
+        background-size: 5px 5px;
+        background-image:
+            linear-gradient(to right, #485942 1px, transparent 1px),
+            linear-gradient(to bottom, #485942 1px, transparent 1px);
         color: #92c847;
-
         display: flex;
         flex-direction: column ;
 
