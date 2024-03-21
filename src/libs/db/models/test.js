@@ -19,7 +19,7 @@ const testSchema = mongoose.Schema({
         ref: "Question"
     }],
     rating: [{
-        qwewqe:{
+        user:{
         type: Schema.Types.ObjectId,
         ref: "User"
         },
@@ -28,6 +28,11 @@ const testSchema = mongoose.Schema({
             enum: ["LIKE","DISLIKE"]
         }
     }],
+    type: {
+        default: "PUBLIC",
+        enum: ["PRIVATE","PUBLIC"],
+        type: String
+    },
     created: {
         type: Date,
         default: Date.now()
@@ -35,6 +40,22 @@ const testSchema = mongoose.Schema({
     endTime: {
         type: Date
     }
-});
+}, {
+    toJSON: {
+        virtuals: true
+    },
+    toObject: {
+        virtuals: true
+    },
+    virtuals: {
+        totalrating: {
+            get() {
+                return this.rating.filter(i=>i.kind==="LIKE").length - this.rating.filter(i=>i.kind==="DISLIKE").length;
+            }
+        }
+    }
+}
+);
+
 
 export default  mongoose.models.Test || mongoose.model("Test",testSchema);

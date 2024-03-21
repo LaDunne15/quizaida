@@ -26,6 +26,7 @@ export default function EditTest({params}) {
             lastname: ""
         },
         theme: "",
+        type: "",
         description: "",
         sourse: [],
         created: "",
@@ -167,6 +168,18 @@ export default function EditTest({params}) {
                 Author:
                 {test.author.firstname} {test.author.lastname}
             </p>
+            <div>
+                <ul>
+                    <li>
+                        <input type="radio" name="type" id="" checked={test.type==="PUBLIC"} onChange={()=>setTest({...test,type:"PUBLIC"})}/>
+                        <span>Public</span>
+                    </li>
+                    <li>
+                        <input type="radio" name="type" id="" checked={test.type==="PRIVATE"} onChange={()=>setTest({...test,type:"PRIVATE"})}/>
+                        <span>Private</span>
+                    </li>
+                </ul>
+            </div>
             <div>
                 <p>Sourses</p>
                 <input type="text" name="" id="" value={sourse} onChange={(e)=>setSourse(e.target.value)}/>

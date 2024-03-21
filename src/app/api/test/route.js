@@ -27,6 +27,14 @@ export async function GET(req) {
                     model: Question
                 });
 
+                const filter =test.rating.filter(i=>i.user.toString() === token.id);
+
+                let liked = 0;
+
+                if( filter.length != 0 ) {
+                    liked = filter[0].kind === "LIKE" ? 1 : -1;
+                }
+
                 const response = await Response.findOne({
                     status: "In process",
                     executor: token.id,
@@ -37,14 +45,16 @@ export async function GET(req) {
                     test,
                     isOwner: test.author._id.toString() === token.id, 
                     inProcess: !!response,
-                    responseId: response? response._id: null
-
+                    responseId: response? response._id: null,
+                    liked
                 },{
                     status: 200,
                     statusText: "OK"
                 });
             } else {
-                const tests = await Test.find({}).populate({
+                const tests = await Test.find({
+                    type: "PUBLIC" 
+                }).populate({
                     path: 'author',
                     model: User
                 });
@@ -105,6 +115,7 @@ export async function POST(request) {
             theme: file.theme,
             sourse: file.sourses,
             description: file.description,
+            type: file.type,
             question: ids
         });
 
@@ -170,6 +181,7 @@ export async function PUT(req) {
                 const newQuestionsIds = createdQuestions.map(doc => doc._id);
                 
                 await Test.findByIdAndUpdate(id, {
+                    type: test.type,
                     theme: test.theme,
                     sourse: test.sourse,
                     description: test.description,

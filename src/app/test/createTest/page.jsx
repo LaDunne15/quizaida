@@ -16,6 +16,7 @@ export default function CreateTest() {
     const [sourse, setSourse] = useState("");
     const [description, setDescription] = useState("");
     const [message, setMessage] = useState("");
+    const [type, setType] = useState("PUBLIC");
 
     const clearQuestion = {
         text: "",
@@ -80,6 +81,7 @@ export default function CreateTest() {
             theme,
             sourses,
             description,
+            type,
             questions: _questions
         }));
         
@@ -129,6 +131,22 @@ export default function CreateTest() {
             <div>
                 <label>Description</label>
                 <textarea name="" id="" cols="30" rows="10" onChange={(e)=>setDescription(e.target.value)}/>
+            </div>
+            
+            <div>
+                <span>
+                    Public type
+                </span>
+                <ul>
+                    <li>
+                        <input type="radio" name="type" value="PUBLIC" id="" onChange={()=>setType("PUBLIC")} defaultChecked/>
+                        <span>Public</span>
+                    </li>
+                    <li>
+                        <input type="radio" name="type" value="PRIVATE" id="" onChange={()=>setType("PRIVATE")}/>
+                        <span>Private</span>
+                    </li>
+                </ul>
             </div>
             <div>
                 <label>Sourses</label>

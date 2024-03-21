@@ -27,7 +27,7 @@ export default () => {
             Cabinet
             <pre>
             {
-                //JSON.stringify(user,null,2)
+                JSON.stringify(user,null,2)
             }
             </pre>
             {

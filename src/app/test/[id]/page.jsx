@@ -6,12 +6,12 @@ import { useEffect, useState } from "react";
 
 export default function EditTest({params}) {
 
-    
     const router = useRouter();
 
     const [isLoading, setIsLoading] = useState(true);
     const [test, setTest] = useState({
         _id:"",
+        type: "",
         author: {
             id: "",
             firstname: "",
@@ -31,12 +31,14 @@ export default function EditTest({params}) {
                 text: "",
                 photo: ""
             }]
-        }]
+        }],
+        totalrating: 0
     });
     const [message, setMessage] = useState("");
     const [isOwner, setIsOwner] = useState(false);
     const [inProcess, setInProcess] = useState(false);
     const [responseId, setResponseId] = useState("");
+    const [liked, setLiked] = useState(0);
 
     useEffect(()=>{
         fetch(`/api/test?id=${params.id}`,{
@@ -53,6 +55,7 @@ export default function EditTest({params}) {
             setIsOwner(data.isOwner);
             setInProcess(data.inProcess);
             setResponseId(data.responseId);
+            setLiked(data.liked);
         }).catch(err=>{
             console.log(err);
         })
@@ -90,6 +93,25 @@ export default function EditTest({params}) {
         });
      }
 
+    const rate = async (type) => {
+        await fetch(`/api/test/rate?id=${test._id}`, {
+            method: "PUT",
+            body: JSON.stringify({
+                type
+            })
+        }).then(res=>{
+            if(res.ok) {
+                return res.json();
+            } else {
+                setMessage(`${res.status} - ${res.statusText}`);
+            }
+        }).then(data=>{
+            console.log(data);
+            setLiked(data.liked);
+            setTest({...test, totalrating: data.rating});
+        });
+    }
+
     if(isLoading) {
         return (
             <div>
@@ -101,7 +123,7 @@ export default function EditTest({params}) {
     return (
         <div>
             <p>ID: {test._id}</p>
-            <p>Theme: {test.theme}</p>
+            <p>Theme: {test.theme} ({test.type})</p>
             <p>Description: {test.description}</p>
             <p>
                 Author:
@@ -113,6 +135,14 @@ export default function EditTest({params}) {
                     test.sourse.map((s,index)=>
                         <a key={s} href={s} target="_blank" rel="noopener noreferrer">[{`Link ${index+1}`}]</a>
                     )
+                }
+            </div>
+            <div>
+                Likes: {test.totalrating}
+                <button onClick={()=>rate("LIKE")}>Like</button>
+                <button onClick={()=>rate("DISLIKE")}>Dislike</button>
+                {
+                    liked
                 }
             </div>
             <p>
