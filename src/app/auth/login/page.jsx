@@ -39,7 +39,7 @@ export default function LogIn () {
             <input type="submit" value="Log In"/>
             <p>{message}</p>
             <Link href="/auth/signup">Haven`t account?</Link>
-            
+            <Link href="/auth/forgotPassword">Forgot password?</Link>
         </form>
     )
 }
