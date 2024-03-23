@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect, useRouter } from "next/navigation";
 //import { useRouter } from "next/router";
@@ -18,6 +19,7 @@ export default function EditTest({params}) {
             lastname: ""
         },
         theme: "",
+        mainImage: "",
         description: "",
         sourse: [""],
         created: "",
@@ -106,7 +108,7 @@ export default function EditTest({params}) {
                 setMessage(`${res.status} - ${res.statusText}`);
             }
         }).then(data=>{
-            console.log(data);
+            //console.log(data);
             setLiked(data.liked);
             setTest({...test, totalrating: data.rating});
         });
@@ -124,6 +126,17 @@ export default function EditTest({params}) {
         <div>
             <p>ID: {test._id}</p>
             <p>Theme: {test.theme} ({test.type})</p>
+            {
+                test.mainImage && <Image
+                style={{
+                    objectFit: "cover"
+                }}
+                src={test.mainImage}
+                alt="Downloaded"
+                width={100}
+                height={100}
+                />
+            }
             <p>Description: {test.description}</p>
             <p>
                 Author:
@@ -187,6 +200,11 @@ export default function EditTest({params}) {
                 <button onClick={startTest}>Start Test</button>
             }
             </div>
+            <pre>
+                {
+                    JSON.stringify(test, null, 2)
+                }
+            </pre>
         </div>
     )
 }

@@ -26,6 +26,7 @@ export default function EditTest({params}) {
             lastname: ""
         },
         theme: "",
+        mainImage: "",
         type: "",
         description: "",
         sourse: [],
@@ -111,8 +112,17 @@ export default function EditTest({params}) {
             return {...i, photo, answer };
         });
 
+        let newImageFilename = "";
+
+        if(typeof test.mainImage!="string") {
+            const idPhoto = uuidv4();
+            formData.append(`${idPhoto}`,test.mainImage);
+            newImageFilename = idPhoto;
+        }
+
         formData.append('test', JSON.stringify({
             ...test,
+            mainImage: typeof test.mainImage==="string"?test.mainImage:newImageFilename,
             question: [ ...test.question , ..._questions]
         }));
 
@@ -160,6 +170,24 @@ export default function EditTest({params}) {
                 Theme:
                 <input type="text" name="" id="" value={test.theme} onChange={(e)=>{setTest({...test,theme:e.target.value})}}/>
             </p>
+            <div>
+                <label>Main image</label>
+                <input type="file" name="" id="" onChange={(e)=> {if (e.target.files.length) setTest({...test,mainImage: e.target.files[0]})}}/>
+                { 
+                
+                    test.mainImage && <Image
+                    priority
+                    style={{
+                        objectFit: "cover"
+                    }}
+                    src={typeof test.mainImage==="string"?test.mainImage:URL.createObjectURL(test.mainImage)}
+                    alt="Downloaded"
+                    width={100}
+                    height={100}
+                    />
+                }
+                <button type="button" onClick={()=>setTest({...test, mainImage:""})}>Remove</button>
+            </div>
             <p>
                 Description:
                 <textarea name="" id="" cols="30" value={test.description} rows="10" onChange={(e)=>{setTest({...test,description:e.target.value})}}></textarea>
@@ -335,6 +363,11 @@ export default function EditTest({params}) {
             <p>
                 Created: {test.created}
             </p>
+            <pre>
+                {
+                    JSON.stringify(test, null, 2)
+                }
+            </pre>
             {
                 message
             }

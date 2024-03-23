@@ -107,6 +107,13 @@ export async function POST(request) {
             return {...i, photo, answer };
         });
 
+        if (file.mainImage!=="") {
+            const _file = formData.get(file.mainImage);
+            const filename = `${file.mainImage}.${_file.name.split('.').pop()}`;
+            file.mainImage = awsService.getFileLink(filename);
+            awsService.uploadFile(_file, filename);
+        }
+
         const createdQuestions = await Question.insertMany(questions);
         const ids = createdQuestions.map(doc => doc._id);
 
@@ -114,6 +121,7 @@ export async function POST(request) {
             author: file.author,
             theme: file.theme,
             sourse: file.sourses,
+            mainImage: file.mainImage,
             description: file.description,
             type: file.type,
             question: ids
@@ -179,11 +187,21 @@ export async function PUT(req) {
 
                 const oldQuestionsIds = test.question.filter(q=>q._id!="").map(doc => doc._id);
                 const newQuestionsIds = createdQuestions.map(doc => doc._id);
+
+
+
+                if(!test.mainImage.includes(".") && test.mainImage!=="") {
+                    const _file = formData.get(test.mainImage);
+                    const filename = `${test.mainImage}.${_file.name.split('.').pop()}`;
+                    test.mainImage = awsService.getFileLink(filename);
+                    awsService.uploadFile(_file, filename);
+                }
                 
                 await Test.findByIdAndUpdate(id, {
                     type: test.type,
                     theme: test.theme,
                     sourse: test.sourse,
+                    mainImage: test.mainImage,
                     description: test.description,
                     question: [...oldQuestionsIds,...newQuestionsIds]
                 });

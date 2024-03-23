@@ -5,6 +5,9 @@ const testSchema = mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "User"
     },
+    mainImage: {
+        type: String
+    },
     theme: {
         type: String
     },

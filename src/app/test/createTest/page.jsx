@@ -15,6 +15,7 @@ export default function CreateTest() {
     const [sourses, setSourses] = useState([]);
     const [sourse, setSourse] = useState("");
     const [description, setDescription] = useState("");
+    const [mainImage, setMainImage] = useState(null);
     const [message, setMessage] = useState("");
     const [type, setType] = useState("PUBLIC");
 
@@ -75,9 +76,18 @@ export default function CreateTest() {
             });
             return {...i, photo, answer };
         });
+        
+        let newImageFilename = "";
+
+        if (mainImage != null) {
+            const idPhoto = uuidv4();
+            formData.append(`${idPhoto}`,mainImage);
+            newImageFilename = idPhoto;
+        }
 
         formData.append('test', JSON.stringify({
             author: auth.id,
+            mainImage: newImageFilename,
             theme,
             sourses,
             description,
@@ -126,6 +136,20 @@ export default function CreateTest() {
     return (
         <form action={createTest}>
             <p>Creating Test</p>
+            <div>
+                <label>Main image</label>
+                <input type="file" name="" id="" onChange={(e)=> {if (e.target.files.length) setMainImage(e.target.files[0])}}/>
+                {
+                    mainImage && <Image
+                        style={{objectFit: "cover"}}
+                        src={URL.createObjectURL(mainImage)}
+                        alt="Main image"
+                        width={100}
+                        height={100}
+                    />
+                }
+                <button type="button" onClick={()=>setMainImage(null)}>Remove</button>
+            </div>
             <label>Theme</label>
             <input type="text" onChange={(e)=>setTheme(e.target.value)}/>
             <div>
