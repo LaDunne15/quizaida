@@ -90,3 +90,23 @@ export async function POST(request) {
         });
     }
 }
+
+export async function PUT(req) {
+    try {
+
+        const body = await req.json();
+        const token = await verifyJwtToken(req.cookies.get('token')?.value);
+        if (token.id == body.user._id) {
+            await User.findByIdAndUpdate(token.id, {
+                firstname: body.user.firstname,
+                lastname: body.user.lastname
+            });
+            return NextResponse.json({ success: true }, { status: 200, statusText: "Updated" });
+        } else {
+            throw new Error("Unauthorized");
+        }
+
+    } catch (error) {
+        return NextResponse.json({ success: false }, { status: 400, statusText: `Error ${error}` });       
+    }
+}

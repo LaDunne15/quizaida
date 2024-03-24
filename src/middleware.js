@@ -28,6 +28,8 @@ export const config = {
     "/test",
     "/test/:path*",
     "/response",
-    "/response/:path*"
+    "/response/:path*",
+    "/user",
+    "/user/edit"
   ]
 }

@@ -1,10 +1,17 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react"
 
 export default () => {
 
-    const [user,setUser] = useState(null);
+    const [user,setUser] = useState({
+        _id:"",
+        email:"",
+        firstname:"",
+        lastname:""
+    });
     const [message, setMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(()=>{
 
@@ -12,6 +19,7 @@ export default () => {
             method: "GET"
         }).then(i=>{
             if(i.ok) {
+                setIsLoading(false);
                 return i.json();
             } else {
                 setMessage(`${i.status} - ${i.statusText}`);
@@ -22,14 +30,17 @@ export default () => {
 
     },[]);
 
+    if (isLoading) {
+        return <p>Loading...</p>
+    }
+
     return (
         <div>
-            Cabinet
-            <pre>
-            {
-                JSON.stringify(user,null,2)
-            }
-            </pre>
+            <p>My cabinet</p>
+            <p>ID: {user._id}</p>
+            <p>Email: {user.email}</p>
+            <p>Name: {user.firstname} {user.lastname}</p>
+            <Link href="/user/edit">Edit</Link>
             {
                 message
             }

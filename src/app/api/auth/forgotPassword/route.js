@@ -3,6 +3,7 @@ import User from "../../../../libs/db/models/user"
 import connect from "../../../../libs/db/mongodb";
 export const dynamic = 'force-dynamic' // defaults to auto
 import bcrypt from "bcrypt";
+import { verifyJwtToken } from "../../../../libs/auth";
 
 connect();
 
@@ -70,6 +71,52 @@ export async function POST(request) {
         return NextResponse.json({},{
             status: 401,
             statusText: "Passwords do not match"
+        })
+    }
+}
+
+export async function PUT(request) {
+
+    try {
+        const body = await request.json();
+        const token = await verifyJwtToken(request.cookies.get('token')?.value);
+
+        if(token.email == body.email) {
+            const hashPassword = (pass, saltRounds = 10) => {
+                try {
+                    return bcrypt.hashSync(pass, saltRounds);
+                } catch (error) {
+                    console.error('Password hashing failed:', error);
+                    throw new Error('Password hashing failed');
+                }
+            };
+
+            const hashedPass2 = hashPassword(body.password2, 10);
+
+            if(bcrypt.compareSync(body.password,hashedPass2)) {
+
+                const newPassword = hashPassword(body.password, 10);
+
+                const user = await User.findOneAndUpdate(
+                    { email: body.email }, 
+                    { password: newPassword }
+                );
+
+                return NextResponse.json({},{
+                    status: 201,
+                    statusText: "Updated password"
+                });
+            } else {
+                throw new Error("Passwords do not match");
+            }
+        } else {
+            throw new Error("Not your account");
+        }
+    }
+    catch (error) {
+        return NextResponse.json({},{
+            status: 401,
+            statusText: `Error ${error}`
         })
     }
 }
