@@ -27,6 +27,8 @@ export async function GET(req) {
                     model: Question
                 });
 
+                console.log(test);
+
                 const filter =test.rating.filter(i=>i.user.toString() === token.id);
 
                 let liked = 0;
@@ -43,7 +45,7 @@ export async function GET(req) {
 
                 return NextResponse.json({
                     test,
-                    isOwner: test.author._id.toString() === token.id, 
+                    isOwner: test.autor?test.author._id.toString() === token.id: false, 
                     inProcess: !!response,
                     responseId: response? response._id: null,
                     liked

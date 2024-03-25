@@ -110,3 +110,23 @@ export async function PUT(req) {
         return NextResponse.json({ success: false }, { status: 400, statusText: `Error ${error}` });       
     }
 }
+
+export async function DELETE(req) {
+    try {
+        const body = await req.json();
+        const token = await verifyJwtToken(req.cookies.get('token')?.value);
+
+        const user = await User.findById(token.id);
+
+        if(bcrypt.compareSync(body.passwordToCorfirm,user.password)) {
+            await User.findByIdAndDelete(token.id);
+            return NextResponse.json({ success: true }, { status: 200, statusText: "Deleted" });
+        } else {
+            throw new Error("Wrong password");
+        }
+
+    } catch (error) {
+        return NextResponse.json({ success: false }, { status: 400, statusText: `Error ${error}` });       
+    }
+}
+

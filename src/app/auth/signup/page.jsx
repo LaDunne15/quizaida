@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import emailjs from '@emailjs/browser';
+import { useRouter } from "next/navigation";
+
 export default function SignUp() {
 
     const [email, setEmail] = useState();
@@ -18,6 +20,11 @@ export default function SignUp() {
 
     const [password, setPassword] = useState("");
     const [password2, setPassword2] = useState("");
+
+    
+    const router = useRouter();
+
+    
 
     function generateSixDigitCode() {
         var code = Math.floor(Math.random() * 900000) + 100000;
@@ -83,6 +90,7 @@ export default function SignUp() {
             })
         }).then(i=>{
             if(i.ok) {
+                router.push("/");
                 setMessage3(`${i.statusText}`);
             } else {
                 setMessage3(`${i.status} - ${i.statusText}`);

@@ -14,10 +14,14 @@ export default () => {
 
     const [message, setMessage] = useState("");
     const [message2, setMessage2] = useState("");
+    const [message3, setMessage3] = useState("");
+
     const [isLoading, setIsLoading] = useState(true);
 
     const [password, setPassword] = useState("");
     const [password2, setPassword2] = useState("");
+
+    const [passwordToCorfirm, setPasswordToCorfirm] = useState(false);
 
     const router = useRouter();
 
@@ -72,6 +76,24 @@ export default () => {
         })
     }
 
+    const deleteAccount = async () => {
+        await fetch('/api/auth/login', {
+            method: "DELETE",
+            body: JSON.stringify({
+                passwordToCorfirm
+            })
+        }).then(i => {
+            if (i.ok) {
+                const cookies = new Cookies();
+                cookies.remove('token');
+                router.push("/");
+                return i.json();
+            } else {
+                setMessage3(`${i.status} - ${i.statusText}`);
+            }
+        })
+    }
+
     if (isLoading) {
         return <p>Loading...</p>
     }
@@ -111,6 +133,18 @@ export default () => {
                     message2
                 }
                 <button type="submit">Change password</button>
+            </form>
+
+            <form action={deleteAccount}>
+                <span>Delete account</span>
+                <div>
+                    <span>Input password to delete account:</span>
+                    <input type="password" autoComplete='on' onChange={(e)=>setPasswordToCorfirm(e.target.value)} />
+                </div>
+                {
+                    message3
+                }
+                <button type="submit">Delete</button>
             </form>
         </div>
     )

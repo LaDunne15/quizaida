@@ -140,7 +140,9 @@ export default function EditTest({params}) {
             <p>Description: {test.description}</p>
             <p>
                 Author:
-                {test.author.firstname} {test.author.lastname}
+                {
+                    test.author? `${test.author.firstname} ${test.author.lastname}`:<p>DELETED</p>
+                }
             </p>
             <div>
                 <p>Sourses</p>
