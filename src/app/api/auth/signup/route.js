@@ -44,19 +44,19 @@ export async function POST(req) {
     
         if(!bcrypt.compareSync(body.password,hashedPass)) throw new Error("Passwords do not match");
 
-            const userObject = {
-                email: body.email,
-                firstname: body.firstname,
-                lastname: body.lastname,
-                password: hashPassword(body.password, 10)
-            }
-            const newUser = new User(userObject);
-            await newUser.save();
-            
-            return NextResponse.json({ newUser },{
-                status: 201,
-                statusText: "Created"
-            });
+        const userObject = {
+            email: body.email,
+            firstname: body.firstname,
+            lastname: body.lastname,
+            password: hashPassword(body.password, 10)
+        }
+        const newUser = new User(userObject);
+        await newUser.save();
+
+        return NextResponse.json({ newUser },{
+            status: 201,
+            statusText: "Created"
+        });
         
     } catch (err) {
         return NextResponse.json({},{
