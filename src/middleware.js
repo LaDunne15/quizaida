@@ -11,7 +11,7 @@ export async function middleware(request) {
     } else {
       return NextResponse.redirect(new URL("/auth/login", request.url));
     }
-  } /* else {
+  } /*else {
     if(url.includes("auth/login")||url.includes("auth/signup")) {
       return NextResponse.redirect(new URL("/", request.url));
     } else {

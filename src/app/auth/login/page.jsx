@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { validationService }  from "../../../libs/validationService"
 import "../../../static/styles/log-in.style.scss";
 
 export default function LogIn () {
@@ -12,16 +13,10 @@ export default function LogIn () {
     
     const router = useRouter();
 
-    const validateEmail = (email) => {
-        return email.match(
-          /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        );
-      };
-
     const logIn = async () => {
         try {
 
-            if ( !validateEmail(email) ) throw new Error("Invalid email");
+            if ( !validationService.validateEmail(email) ) throw new Error("Invalid email");
 
             if ( !email || !password ) throw new Error("Login or password is empty");
 
