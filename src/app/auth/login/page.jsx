@@ -1,9 +1,8 @@
 "use client";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import Cookies from "universal-cookie";
+import "../../../static/styles/log-in.style.scss";
 
 export default function LogIn () {
 
@@ -13,33 +12,54 @@ export default function LogIn () {
     
     const router = useRouter();
 
-    const logIn = async () => {
-        await fetch("/api/auth/login",{
-            method: "POST",
-            body: JSON.stringify({
-                email,
-                password
-            })
-        }).then(i=>{
-            if(i.ok) {
-                router.push("/");
-            } else {
-                setMessage(`${i.status} - ${i.statusText}`);
-            }
-        })
+    const validateEmail = (email) => {
+        return email.match(
+          /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        );
+      };
 
+    const logIn = async () => {
+        try {
+
+            if ( !validateEmail(email) ) throw new Error("Invalid email");
+
+            if ( !email || !password ) throw new Error("Login or password is empty");
+
+            const response = await fetch("/api/auth/login",{
+                method: "POST",
+                body: JSON.stringify({
+                    email,
+                    password
+                })
+            });
+
+            if (!response.ok) throw new Error(response.statusText);
+
+            router.push("/");
+            
+        } catch (err) {
+            setMessage(err.message);
+        }
     }
+
     
     return (
-        <form action={logIn}>
-            <label htmlFor="email">Email</label>
-            <input type="text" name="email" onChange={(e)=>setEmail(e.target.value)}/>
-            <label htmlFor="password">Password</label>
-            <input type="password" autoComplete="on" onChange={(e)=>setPassword(e.target.value)}/>
+        <form action={logIn} className="log-in">
+            <h1 className="title">Log In to Quizaida</h1>
+            <div className="input">
+                <label htmlFor="email">Email</label>
+                <input type="text" name="email" onChange={(e)=>setEmail(e.target.value)} required/>
+            </div>
+            <div className="input">
+                <label htmlFor="password">Password</label>
+                <input type="password" autoComplete="on" onChange={(e)=>setPassword(e.target.value)} required/>
+            </div>
+            <p>{ message }</p>
             <input type="submit" value="Log In"/>
-            <p>{message}</p>
-            <Link href="/auth/signup">Haven`t account?</Link>
-            <Link href="/auth/forgotPassword">Forgot password?</Link>
+            <ul>
+                <li><Link href="/auth/signup">Haven`t account?</Link></li>
+                <li><Link href="/auth/forgotPassword">Forgot password?</Link></li>
+            </ul>
         </form>
     )
 }

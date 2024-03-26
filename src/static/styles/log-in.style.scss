@@ -1,0 +1,108 @@
+.log-in {
+
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    max-width: 425px;
+    min-width: 300px;
+    align-self: center;
+    justify-content: center;
+
+    
+    text-shadow: 1px 1px 1.5px rgba(0, 0, 0, 0.6);
+
+    .title {
+        background-color: #43523d;
+        background-size: 5px 5px;
+        background-image:
+            linear-gradient(to right, #485942 1px, transparent 1px),
+            linear-gradient(to bottom, #485942 1px, transparent 1px);
+        padding: 5px;
+        color: #92c847;
+        font-size: large;
+        text-transform: uppercase;
+        font-weight: bold;
+        text-align: center;
+        box-shadow: 1px 1px 1.5px black;
+    }
+
+    .input {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+
+        label {
+            padding-left: 10px;
+        }
+
+        input {
+            background: none;
+            border: 2px solid #43523d;
+            font-weight: 700;
+            padding: 6px;
+            border-radius: 3px;
+            color: #43523d;
+            box-shadow: 1px 1px 1.5px black, inset 1px 1px 1.5px black;
+
+            &:focus::placeholder {
+                background-color: transparent;
+            }
+        }
+    }
+
+    >p {
+        min-height: 16px;
+        font-size: small;
+        padding-left: 20px;
+        display: block;
+    }
+
+    ul {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        li {
+
+            transition: 0.25s ease-in-out;
+
+            a   {
+                font-size: small;
+                color: #43523d;
+                padding-left: 10px;
+                text-shadow: 1px 1px 1.5px black;
+
+                &::before {
+                    content: "#";
+                    padding-right: 5px;
+                }
+
+                
+            }
+
+            &:hover {
+                transform: translateX(15px);
+            }
+        }
+    }
+
+    >input {
+        background: repeating-linear-gradient(
+            -45deg,
+            #485942,
+            #485942 2px,
+            #43523d 2px,
+            #43523d 10px
+        );
+        color: #92c847;
+        padding: 10px;
+        text-decoration: underline;
+        text-shadow: 1px 1px 1.5px black;
+        transition: 0.25s ease-in-out;
+
+        &:hover {
+            
+            border-radius: 15px;
+        }
+    }
+}

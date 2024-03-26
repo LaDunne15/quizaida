@@ -31,8 +31,8 @@ export default function NavBar() {
                     <span>uizaida</span>
                 </Link>
             </span>
-            {
-                auth &&
+            
+                
                 <ul>
                     <li>
                         <Link href="/test">
@@ -67,7 +67,7 @@ export default function NavBar() {
                         </button>
                     </li>
                 </ul>
-            }
+            
         </nav>
     )
 }

@@ -47,46 +47,38 @@ export async function GET(req) {
 
 export async function POST(request) {
 
-    const body = await request.json();
-    const user = await User.findOne({email:body.email});
+    try {
+        const body = await request.json();
+        const user = await User.findOne({email:body.email});
 
-    if(user) {
-        if(bcrypt.compareSync(body.password,user.password)){
-            const token = await new SignJWT({
-                id: user._id,
-                email: body.email
-            })
-            .setProtectedHeader({alg:"HS256"})
-            .setIssuedAt()
-            .setExpirationTime("1day")
-            .sign(getJwtSecretKey());
-            const response = NextResponse.json({
-                success: true
-            }, {
-                status: 200,
-                headers: { "content-type": "application/json" }
-            })
-            response.cookies.set({
-                name: "token",
-                value: token,
-                path: "/",
-            });
-            return response;
+        if (!user) throw new Error("User not found");
+        if (!bcrypt.compareSync(body.password, user.password)) throw new Error("Wrong password");
 
-        }   else {
-            return NextResponse.json({
-                success: false
-            },{
-                status: 401,
-                statusText: "Incorect password"
-            });
-        }
-    } else {
-        return NextResponse.json({
-            success: false
-        },{
-            status: 404,
-            statusText: "User not Found"
+        const token = await new SignJWT({
+            id: user._id,
+            email: body.email
+        })
+        .setProtectedHeader({alg:"HS256"})
+        .setIssuedAt()
+        .setExpirationTime("1day")
+        .sign(getJwtSecretKey());
+
+        const response = NextResponse.json({}, {
+            status: 200
+        })
+        
+        response.cookies.set({
+            name: "token",
+            value: token,
+            path: "/",
+        });
+
+        return response;
+            
+    } catch (err) {
+        return NextResponse.json({},{
+            status: 400,
+            statusText: `${err.message}`
         });
     }
 }
