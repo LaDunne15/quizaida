@@ -26,7 +26,9 @@ export async function GET(req) {
         });
 
     } catch (err) {
-        return NextResponse.json({},{
+        return NextResponse.json({
+            success: false
+        },{
             status: 400,
             statusText: `${err}`
         });

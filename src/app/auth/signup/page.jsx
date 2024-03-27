@@ -34,16 +34,14 @@ export default function SignUp() {
             if(!email) throw new Error('Email is required');
             if(!validationService.validateEmail(email)) throw new Error('Invalid email');
             const response = await fetch(`/api/auth/signup?email=${email}`,{ method: "GET" });
+            const data = await response.json()
 
-            console.log(response);
-
-            //if (!response.ok) throw new Error(response.statusText);
+            if (!data.success) throw new Error(response.statusText);
 
             setIsValidEmail(true);
             setMessage("");
 
         } catch (err) {
-            console.log(err);
             setMessage(err.message);
         }
     }
@@ -114,7 +112,7 @@ export default function SignUp() {
                             <input type="text" name="email" value={email || ""} onChange={(e)=>{ setEmail(e.target.value)}}/>
                         </p>
                     </div>
-                    <span>{ JSON.stringify(message)}</span>
+                    <span>{ message }</span>
                     <div className="buttons">
                         <input type="submit" value="Check"/>
                     </div>
