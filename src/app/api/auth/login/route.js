@@ -51,8 +51,14 @@ export async function POST(request) {
         const body = await request.json();
         const user = await User.findOne({email:body.email});
 
-        if (!user) throw new Error("User not found");
-        if (!bcrypt.compareSync(body.password, user.password)) throw new Error("Wrong password");
+        if (!user) return NextResponse.json({},{
+            status: 400,
+            statusText: "User not found"
+        });//throw new Error("User not found");
+        if (!bcrypt.compareSync(body.password, user.password)) return NextResponse.json({},{
+            status: 400,
+            statusText: "Wrong password"
+        });//throw new Error("Wrong password");
 
         const token = await new SignJWT({
             id: user._id,
