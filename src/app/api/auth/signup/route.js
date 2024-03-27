@@ -12,7 +12,7 @@ export async function GET(req) {
         const user = await User.findOne({ email });
 
         if (user) throw new Error("This email is already in use by another user");
-
+        
         return NextResponse.json({}, {
             status: 201,
             statusText: "This email is free"
