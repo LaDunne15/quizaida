@@ -46,47 +46,39 @@ export async function GET(req) {
 }
 
 export async function POST(request) {
+    const body = await request.json();
+    const user = await User.findOne({email:body.email});
 
-    try {
-        const body = await request.json();
-        const user = await User.findOne({email:body.email});
+    if (!user) return NextResponse.json({},{
+        status: 400,
+        statusText: "User not found"
+    });//throw new Error("User not found");
 
-        if (!user) return NextResponse.json({},{
-            status: 400,
-            statusText: "User not found"
-        });//throw new Error("User not found");
-        if (!bcrypt.compareSync(body.password, user.password)) return NextResponse.json({},{
-            status: 400,
-            statusText: "Wrong password"
-        });//throw new Error("Wrong password");
+    if (!bcrypt.compareSync(body.password, user.password)) return NextResponse.json({},{
+        status: 400,
+        statusText: "Wrong password"
+    });//throw new Error("Wrong password");
 
-        const token = await new SignJWT({
-            id: user._id,
-            email: body.email
-        })
-        .setProtectedHeader({alg:"HS256"})
-        .setIssuedAt()
-        .setExpirationTime("1day")
-        .sign(getJwtSecretKey());
+    const token = await new SignJWT({
+        id: user._id,
+        email: body.email
+    })
+    .setProtectedHeader({alg:"HS256"})
+    .setIssuedAt()
+    .setExpirationTime("1day")
+    .sign(getJwtSecretKey());
 
-        const response = NextResponse.json({}, {
-            status: 200
-        })
+    const response = NextResponse.json({}, {
+        status: 200
+    })
         
-        response.cookies.set({
-            name: "token",
-            value: token,
-            path: "/",
-        });
+    response.cookies.set({
+        name: "token",
+        value: token,
+        path: "/",
+    });
 
-        return response;
-            
-    } catch (err) {
-        return NextResponse.json({},{
-            status: 400,
-            statusText: `${err.message}`
-        });
-    }
+    return response;
 }
 
 export async function PUT(req) {
