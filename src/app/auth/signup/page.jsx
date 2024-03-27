@@ -41,7 +41,6 @@ export default function SignUp() {
             setMessage("");
 
         } catch (err) {
-            console.log(err);
             setMessage(err.message);
         }
     }
@@ -112,7 +111,7 @@ export default function SignUp() {
                             <input type="text" name="email" value={email || ""} onChange={(e)=>{ setEmail(e.target.value)}}/>
                         </p>
                     </div>
-                    <span>{message}</span>
+                    <span>{ JSON.stringify(message)}</span>
                     <div className="buttons">
                         <input type="submit" value="Check"/>
                     </div>

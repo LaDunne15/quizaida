@@ -11,15 +11,17 @@ export async function GET(req) {
         const email = req.nextUrl.searchParams.get("email");
         const user = await User.findOne({ email });
 
-        if (user) throw "This email is already in use by another user";
-
+        if (user) return NextResponse.json({}, {
+            status: 400,
+            statusText: "This email is already in use by another user"
+        });
+        
         return NextResponse.json({}, {
             status: 201,
             statusText: "This email is free"
         });
 
     } catch (err) {
-        console.log(err);
         return NextResponse.json({},{
             status: 400,
             statusText: `${err}`
