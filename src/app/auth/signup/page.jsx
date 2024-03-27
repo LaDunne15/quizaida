@@ -41,6 +41,7 @@ export default function SignUp() {
             setMessage("");
 
         } catch (err) {
+            console.log(err.message);
             setMessage(err.message);
         }
     }
