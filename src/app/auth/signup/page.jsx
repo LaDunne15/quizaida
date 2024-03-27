@@ -35,7 +35,9 @@ export default function SignUp() {
             if(!validationService.validateEmail(email)) throw new Error('Invalid email');
             const response = await fetch(`/api/auth/signup?email=${email}`,{ method: "GET" });
 
-            if (!response.ok) throw new Error(response.statusText);
+            console.log(response);
+
+            //if (!response.ok) throw new Error(response.statusText);
 
             setIsValidEmail(true);
             setMessage("");
