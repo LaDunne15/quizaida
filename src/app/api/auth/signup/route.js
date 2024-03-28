@@ -18,7 +18,7 @@ export async function GET(req) {
         return NextResponse.json({
             statusText: "This email is available"        
         }, {
-            status: 400
+            status: 200
         });   
 
     } catch (err) {
