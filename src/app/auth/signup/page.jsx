@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import emailjs from '@emailjs/browser';
 import { useRouter } from "next/navigation";
 import { validationService } from "../../../libs/validationService";
+import { generationService } from "../../../libs/generationService";
 import "../../../static/styles/sign-up.style.scss";
 
 export default function SignUp() {
@@ -26,17 +27,16 @@ export default function SignUp() {
     
     const router = useRouter();
 
-    const generateSixDigitCode = () => Math.floor(Math.random() * 900000) + 100000;
-
     const signUp = async () => {
         try {
+
             if(!email) throw new Error('Email is required');
             if(!validationService.validateEmail(email)) throw new Error('Invalid email');
 
             const response = await fetch(`/api/auth/signup?email=${email}`,{ method: "GET" });
             const data = await response.json();
-            console.log(response, data);
-            if (!response.ok) { setMessage(data.statusText);  return; }
+
+            if (!response.ok) throw new Error(data.statusText);
     
             setIsValidEmail(true);
             setMessage("");
@@ -52,7 +52,7 @@ export default function SignUp() {
             if(!firstname) throw new Error('Firstname is required');
             if(!lastname) throw new Error('Lastname is required');
 
-            const code = generateSixDigitCode();
+            const code = generationService.generateSixDigitCode();
             setTestCode(code);
     
             var templateParams = {
@@ -67,6 +67,7 @@ export default function SignUp() {
                 (error) => { throw new Error(error); },
             );
             setMessage("");
+
         } catch (err) {
             setMessage(err.message);
         }
@@ -92,7 +93,8 @@ export default function SignUp() {
                 })
             });
 
-            if (!response.ok) throw new Error(response.statusText);
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.statusText);
 
             setMessage("");
             router.push("/");

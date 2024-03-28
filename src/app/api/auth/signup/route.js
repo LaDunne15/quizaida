@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import User from "../../../../libs/db/models/user"
 import connect from "../../../../libs/db/mongodb";
+import { generationService } from "../../../../libs/generationService";
 export const dynamic = 'force-dynamic' // defaults to auto
 import bcrypt from "bcrypt";
 
@@ -32,18 +33,10 @@ export async function GET(req) {
 export async function POST(req) {
 
     try {
+
         const body = await req.json();
 
-        const hashPassword = (pass, saltRounds = 10) => {
-            try {
-                return bcrypt.hashSync(pass, saltRounds);
-            } catch (error) {
-                //console.error('Password hashing failed:', error);
-                throw 'Password hashing failed';
-            }
-        };
-
-        const hashedPass = hashPassword(body.password2, 10);
+        const hashedPass = generationService.hashPassword(body.password2, 10);
     
         if(!bcrypt.compareSync(body.password,hashedPass)) throw "Passwords do not match";
 
@@ -51,21 +44,23 @@ export async function POST(req) {
             email: body.email,
             firstname: body.firstname,
             lastname: body.lastname,
-            password: hashPassword(body.password, 10)
+            password: generationService.hashPassword(body.password, 10)
         }
+
         const newUser = new User(userObject);
         await newUser.save();
 
-        return NextResponse.json({ newUser },{
-            status: 201,
-            statusText: "Created"
+        return NextResponse.json({ 
+            statusText: "Created" 
+        },{ 
+            status: 201 
         });
         
-    } catch (msg) {
+    } catch (err) {
         return NextResponse.json({
-            statusText: msg
-        },{
+            statusText: err.message
+        }, {
             status: 400
-        });
+        });    
     }
 }

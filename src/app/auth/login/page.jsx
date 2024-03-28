@@ -28,7 +28,8 @@ export default function LogIn () {
                 })
             });
 
-            if (!response.ok) throw new Error(response.statusText);
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.statusText);
 
             router.push("/");
             

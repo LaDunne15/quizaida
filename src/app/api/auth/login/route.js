@@ -45,40 +45,45 @@ export async function GET(req) {
     }
 }
 
-export async function POST(request) {
-    const body = await request.json();
-    const user = await User.findOne({email:body.email});
+export async function POST(req) {
 
-    if (!user) return NextResponse.json({},{
-        status: 400,
-        statusText: "User not found"
-    });//throw new Error("User not found");
+    try {
 
-    if (!bcrypt.compareSync(body.password, user.password)) return NextResponse.json({},{
-        status: 400,
-        statusText: "Wrong password"
-    });//throw new Error("Wrong password");
+        const body = await req.json();
+        const user = await User.findOne({ email:body.email });
+    
+        if (!user) throw new Error("User not found");
+    
+        if (!bcrypt.compareSync(body.password, user.password)) throw new Error("Wrong password");
+    
+        const token = await new SignJWT({
+            id: user._id,
+            email: body.email
+        })
+        .setProtectedHeader({alg:"HS256"})
+        .setIssuedAt()
+        .setExpirationTime("1day")
+        .sign(getJwtSecretKey());
+    
+        const response = NextResponse.json({}, { 
+            status: 200 
+        });
+            
+        response.cookies.set({
+            name: "token",
+            value: token,
+            path: "/",
+        });
+    
+        return response;
 
-    const token = await new SignJWT({
-        id: user._id,
-        email: body.email
-    })
-    .setProtectedHeader({alg:"HS256"})
-    .setIssuedAt()
-    .setExpirationTime("1day")
-    .sign(getJwtSecretKey());
-
-    const response = NextResponse.json({}, {
-        status: 200
-    })
-        
-    response.cookies.set({
-        name: "token",
-        value: token,
-        path: "/",
-    });
-
-    return response;
+    } catch (err) {
+        return NextResponse.json({
+            statusText: err.message
+        }, { 
+            status: 400
+        });
+    }
 }
 
 export async function PUT(req) {
