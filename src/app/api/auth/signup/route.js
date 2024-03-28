@@ -36,15 +36,24 @@ export async function POST(req) {
 
         const body = await req.json();
 
-        const hashedPass = generationService.hashPassword(body.password2, 10);
+        const hashPassword = (pass, saltRounds = 10) => {
+            try {
+                return bcrypt.hashSync(pass, saltRounds);
+            } catch (error) {
+                console.error('Password hashing failed:', error);
+                throw new Error('Password hashing failed');
+            }
+        };
+
+        const hashedPass = hashPassword(body.password2, 10);
     
-        if(!bcrypt.compareSync(body.password,hashedPass)) throw "Passwords do not match";
+        if(!bcrypt.compareSync(body.password,hashedPass)) throw new Error ("Passwords do not match");
 
         const userObject = {
             email: body.email,
             firstname: body.firstname,
             lastname: body.lastname,
-            password: generationService.hashPassword(body.password, 10)
+            password: hashPassword(body.password, 10)
         }
 
         const newUser = new User(userObject);
