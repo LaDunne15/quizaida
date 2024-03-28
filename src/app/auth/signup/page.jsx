@@ -30,9 +30,9 @@ export default function SignUp() {
 
     const signUp = async () => {
         try {
-            if(!email) throw 'Email is required';
-            if(!validationService.validateEmail(email)) throw 'Invalid email';
-            
+            if(!email) throw new Error('Email is required');
+            if(!validationService.validateEmail(email)) throw new Error('Invalid email');
+
             const response = await fetch(`/api/auth/signup?email=${email}`,{ method: "GET" });
             const data = await response.json();
             console.log(response, data);
@@ -41,8 +41,8 @@ export default function SignUp() {
             setIsValidEmail(true);
             setMessage("");
 
-        } catch (msg) {
-            setMessage(msg);
+        } catch (err) {
+            setMessage(err.message);
         }        
     }
 

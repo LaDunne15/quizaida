@@ -12,7 +12,7 @@ export async function GET(req) {
         const email = req.nextUrl.searchParams.get("email");
         const user = await User.findOne({ email });
 
-        if (user) throw "This email is already taken";
+        if (user) throw new Error ("This email is already taken");
 
         return NextResponse.json({
             statusText: "This email is available"        
@@ -20,17 +20,14 @@ export async function GET(req) {
             status: 400
         });   
 
-    } catch (msg) {
+    } catch (err) {
         return NextResponse.json({
-            statusText: msg
+            statusText: err.message
         }, {
             status: 400
         });    
     }
 }
-    
-
-    
 
 export async function POST(req) {
 
@@ -41,14 +38,14 @@ export async function POST(req) {
             try {
                 return bcrypt.hashSync(pass, saltRounds);
             } catch (error) {
-                console.error('Password hashing failed:', error);
-                throw new Error('Password hashing failed');
+                //console.error('Password hashing failed:', error);
+                throw 'Password hashing failed';
             }
         };
 
         const hashedPass = hashPassword(body.password2, 10);
     
-        if(!bcrypt.compareSync(body.password,hashedPass)) throw new Error("Passwords do not match");
+        if(!bcrypt.compareSync(body.password,hashedPass)) throw "Passwords do not match";
 
         const userObject = {
             email: body.email,
@@ -64,10 +61,11 @@ export async function POST(req) {
             statusText: "Created"
         });
         
-    } catch (err) {
-        return NextResponse.json({},{
-            status: 400,
-            statusText: `${err.message}`
+    } catch (msg) {
+        return NextResponse.json({
+            statusText: msg
+        },{
+            status: 400
         });
     }
 }
