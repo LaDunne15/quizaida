@@ -7,32 +7,17 @@ import bcrypt from "bcrypt";
 connect();
 
 export async function GET(req) {
-    try {
-        const email = req.nextUrl.searchParams.get("email");
-        const user = await User.findOne({ email });
+    const email = req.nextUrl.searchParams.get("email");
+    const user = await User.findOne({ email });
 
-        if (user) return NextResponse.json({
-            success: false
-        }, {
-            status: 201,
-            statusText: "This email is already in use by another user"
-        });
+    if (user) return NextResponse.json({}, {
+        status: 400,
+        statusText: "This email is already in use by another user"
+    });
 
-        return NextResponse.json({
-            success: true
-        }, {
-            status: 201,
-            statusText: "This email is free"
-        });
-
-    } catch (err) {
-        return NextResponse.json({
-            success: false
-        },{
-            status: 400,
-            statusText: `${err}`
-        });
-    }
+    return NextResponse.json({
+        success: true
+    });    
 }
 
 export async function POST(req) {
