@@ -29,16 +29,21 @@ export default function SignUp() {
     const generateSixDigitCode = () => Math.floor(Math.random() * 900000) + 100000;
 
     const signUp = async () => {
+        try {
+            if(!email) throw 'Email is required';
+            if(!validationService.validateEmail(email)) throw 'Invalid email';
+            
+            const response = await fetch(`/api/auth/signup?email=${email}`,{ method: "GET" });
+            const data = await response.json();
+            console.log(response, data);
+            if (!response.ok) { setMessage(data.statusText);  return; }
+    
+            setIsValidEmail(true);
+            setMessage("");
 
-        if(!email) { setMessage('Email is required'); return; } 
-        if(!validationService.validateEmail(email)) { setMessage('Invalid email'); return; }
-        const response = await fetch(`/api/auth/signup?email=${email}`,{ method: "GET" });
-        const data = await response.json();
-        console.log(response, data);
-        if (!response.ok) { setMessage(data.statusText);  return; }
-
-        setIsValidEmail(true);
-        setMessage("");
+        } catch (msg) {
+            setMessage(msg);
+        }        
     }
 
     const sendCode = async () => {

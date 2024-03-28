@@ -7,21 +7,30 @@ import bcrypt from "bcrypt";
 connect();
 
 export async function GET(req) {
-    const email = req.nextUrl.searchParams.get("email");
-    const user = await User.findOne({ email });
 
-    if (user) return NextResponse.json({
-        statusText: "This email is already in use by another user"
-    }, {
-        status: 400
-    });
+    try {
+        const email = req.nextUrl.searchParams.get("email");
+        const user = await User.findOne({ email });
 
-    return NextResponse.json({
-        statusText: "Email is available"
-    }, {
-        status: 200
-    });    
+        if (user) throw "This email is already taken";
+
+        return NextResponse.json({
+            statusText: "This email is available"        
+        }, {
+            status: 400
+        });   
+
+    } catch (msg) {
+        return NextResponse.json({
+            statusText: msg
+        }, {
+            status: 400
+        });    
+    }
 }
+    
+
+    
 
 export async function POST(req) {
 
