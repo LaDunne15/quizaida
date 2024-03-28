@@ -105,6 +105,7 @@ export default function SignUp() {
 
     return (
         <div className="sign-up">
+            <h1 className="title">Sign Up to Quizaida</h1>
             {   
                 !isValidEmail &&
                 <form action={signUp} className="section">
