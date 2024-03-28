@@ -35,7 +35,7 @@ export default function SignUp() {
         const response = await fetch(`/api/auth/signup?email=${email}`,{ method: "GET" });
         const data = await response.json();
         console.log(response, data);
-        if (!data.success) { setMessage(response.statusText);  return; }
+        if (!response.ok) { setMessage(data.statusText);  return; }
 
         setIsValidEmail(true);
         setMessage("");

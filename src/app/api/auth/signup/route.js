@@ -11,14 +11,15 @@ export async function GET(req) {
     const user = await User.findOne({ email });
 
     if (user) return NextResponse.json({
-        notEmpty: "notEmptyBody"
-    }, {
-        status: 400,
         statusText: "This email is already in use by another user"
+    }, {
+        status: 400
     });
 
     return NextResponse.json({
-        success: true
+        statusText: "Email is available"
+    }, {
+        status: 200
     });    
 }
 
