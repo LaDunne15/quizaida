@@ -10,7 +10,9 @@ export async function GET(req) {
     const email = req.nextUrl.searchParams.get("email");
     const user = await User.findOne({ email });
 
-    if (user) return NextResponse.json({}, {
+    if (user) return NextResponse.json({
+        notEmpty: "notEmptyBody"
+    }, {
         status: 400,
         statusText: "This email is already in use by another user"
     });
