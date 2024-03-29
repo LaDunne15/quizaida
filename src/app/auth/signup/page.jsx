@@ -4,9 +4,10 @@ import emailjs from '@emailjs/browser';
 import { useRouter } from "next/navigation";
 import { validationService } from "../../../libs/validationService";
 import { generationService } from "../../../libs/generationService";
-import "../../../static/styles/sign-up.style.scss";
+import Link from "next/link";
+//import "../../../static/styles/sign-up.style.scss";
 
-export default function SignUp() {
+export default () => {
 
     const [email, setEmail] = useState();
 
@@ -95,8 +96,6 @@ export default function SignUp() {
 
             const data = await response.json();
 
-            console.log(response,data);
-
             if (!response.ok) throw new Error(data.statusText);
 
             setMessage("");
@@ -134,7 +133,6 @@ export default function SignUp() {
                         </p>
                     </div>
                     <div className="input-data">
-                        <span>Input your data</span>
                         <p>
                             <label>Firstname</label>
                             <input type="text" name="firstname" value={firstname || ""} onChange={(e)=>{setFirstname(e.target.value)}} required/>
@@ -228,6 +226,9 @@ export default function SignUp() {
                     </div>
                 </form>
             }
+            <ul className="links">
+                <li><Link href="/auth/login">Already have an account?</Link></li>
+            </ul>
         </div>
     )
 }

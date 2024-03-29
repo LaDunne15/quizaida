@@ -8,71 +8,71 @@ import { verifyJwtToken } from "../../../../libs/auth";
 connect();
 
 export async function GET(req) {
-    const email = req.nextUrl.searchParams.get("email");
-
 
     try {
+    
+        const email = req.nextUrl.searchParams.get("email");
         const user = await User.findOne({ email });
 
-        if (user) {
-            return NextResponse.json({
-                message: "User found"
-            }, {
-                status: 200
-            });
-        } else {
-            return NextResponse.json({
-                message: "User not found"
-            }, {
-                status: 404
-            });
-        }
-    } catch (error) {
-        console.error("Помилка", error);
+        if (!user) throw new Error ("User not found");
+        
         return NextResponse.json({
-            message: "Internal Server Error"
+            statusText: "User found"
         }, {
-            status: 500,
-            statusText: "Internal Server Error"
+            status: 200
+        });
+        
+    } catch (err) {
+        return NextResponse.json({
+            statusText: err.message
+        }, {
+            status: 400
         });
     }
 }
 
-export async function POST(request) {
+export async function POST(req) {
 
-    const body = await request.json();
+    try {
 
-    const hashPassword = (pass, saltRounds = 10) => {
-        try {
-            return bcrypt.hashSync(pass, saltRounds);
-        } catch (error) {
-            console.error('Password hashing failed:', error);
-            throw new Error('Password hashing failed');
-        }
-    };
+        const body = await req.json();
 
-    const hashedPass = hashPassword(body.password2, 10);
-
-    if(bcrypt.compareSync(body.password,hashedPass)) {
-
-        const newPassword = hashPassword(body.password, 10);
-
-        const user = await User.findOneAndUpdate(
-            { email: body.email }, 
-            { password: newPassword },
-            { new: true }
-        );
-
-        return NextResponse.json({ },{
-            status: 200,
-            statusText: "Updated"
+        const hashPassword = (pass, saltRounds = 10) => {
+            try {
+                return bcrypt.hashSync(pass, saltRounds);
+            } catch (error) {
+                console.error('Password hashing failed:', error);
+                throw new Error('Password hashing failed');
+            }
+        };
+    
+        const hashedPass = hashPassword(body.password2, 10);
+    
+        if(!bcrypt.compareSync(body.password,hashedPass)) throw new Error ("Passwords do not match");
+        
+        const user = await User.findOneAndUpdate({ 
+            email: body.email
+        }, { 
+            password: hashPassword(body.password, 10)
+        }, {
+            new: true 
         });
-    } else {
-        return NextResponse.json({},{
-            status: 401,
-            statusText: "Passwords do not match"
+        await user.save();
+    
+        return NextResponse.json({
+            statusText: "Updated"
+        },{
+            status: 200
+        });
+        
+    } catch (err) {
+        return NextResponse.json({
+            statusText: err.message
+        }, {
+            status: 400
         })
     }
+
 }
 
 export async function PUT(request) {

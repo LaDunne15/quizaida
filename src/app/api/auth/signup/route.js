@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import User from "../../../../libs/db/models/user"
 import connect from "../../../../libs/db/mongodb";
-import { generationService } from "../../../../libs/generationService";
 export const dynamic = 'force-dynamic' // defaults to auto
 import bcrypt from "bcrypt";
 
