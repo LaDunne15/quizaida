@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { useAuth } from "./../hooks/useAuth";
 import { redirect, useRouter } from "next/navigation";
-import Cookies from "universal-cookie";
 import Image from "next/image";
 
 import questionIcon from "../static/icons/question.png";
@@ -13,13 +12,7 @@ export default function NavBar() {
     const auth = useAuth();
     const router = useRouter();
 
-    const Logout = () => {
-        
-        const cookies = new Cookies();
-        cookies.remove('token');
-
-        router.push("/");
-    }
+    
 
     return (
         <nav>
@@ -37,7 +30,7 @@ export default function NavBar() {
                     <li>
                         <Link href="/test">
                             <div>
-                                <Image priority src={questionIcon} width={30} height={30} alt="Tests"/>
+                                <Image priority src={questionIcon} width={25} height={25} alt="Tests"/>
                             </div>
                             <span>Tests</span>
                         </Link>
@@ -45,7 +38,7 @@ export default function NavBar() {
                     <li>
                         <Link href="/response">
                             <div>
-                                <Image priority src={questionIcon} width={30} height={30} alt="Response"/>
+                                <Image priority src={questionIcon} width={25} height={25} alt="Response"/>
                             </div>
                             <span>Response</span>
                         </Link>
@@ -53,18 +46,10 @@ export default function NavBar() {
                     <li>
                         <Link href="/user">
                             <div>
-                                <Image priority src={questionIcon} width={30} height={30} alt="Account"/>
+                                <Image priority src={questionIcon} width={25} height={25} alt="Account"/>
                             </div>
                             <span>Account</span>
                         </Link>
-                    </li>
-                    <li>
-                        <button onClick={Logout}>
-                            <div>
-                                <Image priority src={questionIcon} width={30} height={30} alt="Log Out"/>
-                            </div>
-                            <span>Log Out</span>
-                        </button>
                     </li>
                 </ul>
             

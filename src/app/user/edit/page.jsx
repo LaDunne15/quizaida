@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Cookies from "universal-cookie";
 import { useEffect, useState } from "react"
 
 export default () => {
@@ -94,6 +95,14 @@ export default () => {
         })
     }
 
+    const Logout = () => {
+        
+        const cookies = new Cookies();
+        cookies.set('token', "");
+
+        router.push("/");
+    }
+
     if (isLoading) {
         return <p>Loading...</p>
     }
@@ -146,6 +155,10 @@ export default () => {
                 }
                 <button type="submit">Delete</button>
             </form>
+
+            <button onClick={Logout}>
+                <span>Log Out</span>
+            </button>
         </div>
     )
 }

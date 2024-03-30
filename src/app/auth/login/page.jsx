@@ -2,8 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { validationService }  from "../../../libs/validationService"
-//import "../../../static/styles/log-in.style.scss";
+import { validationService }  from "../../../libs/validationService";
 
 export default () => {
 

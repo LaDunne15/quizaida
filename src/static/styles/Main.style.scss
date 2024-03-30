@@ -1,6 +1,7 @@
 @use 'variables';
 @import "./reset.css";
 @import url('https://fonts.cdnfonts.com/css/nokia-3410');
+@import "./auth-forms.scss";
 
 * {
     font-family: 'Nokia 3410', sans-serif;
@@ -9,130 +10,9 @@
 .app {
     display: flex;
     flex-direction: column;
-    background-color: #92c847;
+    background-color: variables.$greenLight;
     min-height: 100vh;
     text-shadow: 0.5px 0.5px 1.5px rgba(0, 0, 0, 0.6);
-
-    .log-in, .sign-up, .forgot-password {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-
-        width: 300px;
-        justify-content: center;
-        align-self: center;
-
-        .section {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-    
-            p {
-                display: flex;
-                flex-direction: column;
-                gap: 3px;
-    
-                label {
-                    padding-left: 10px;
-                }
-            }
-    
-            span {
-                font-size: small;
-                padding-left: 20px;
-                display: block;
-            }
-    
-            .data {
-                display: flex;
-                flex-direction: column;
-                gap: 5px;
-    
-                p {
-                    display: flex;
-    
-                    label {
-    
-                        &:first-child {
-                            font-size: xx-small;
-                            padding-left: 20px;
-                        }
-    
-                        &:last-child {
-                            font-weight: bold;
-                        }
-                    }
-                }
-            }
-    
-            .input-data {
-    
-                display: flex;
-                flex-direction: column;
-                gap: 3px;
-    
-                p {
-                    label {
-                        font-size: x-small;
-                    }
-                }
-    
-                .regenerate {
-                    position: relative;
-                    transform: translate(0, -65px);
-                    width: 30px;
-                    height: 30px;
-                    align-self: self-end;
-                }
-            }
-    
-            .buttons {
-    
-                display: flex;
-                justify-content: flex-end;
-                gap: 5px;
-
-                >* {
-                    flex: 1;
-                }
-    
-                button {
-                    background: none;
-                    text-decoration: underline;
-                    text-shadow: 1px 1px 1.5px black;
-                    transition: 0.25s ease-in-out;
-                }
-            }
-        }
-
-        .links {
-
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            li {
-    
-                transition: 0.25s ease-in-out;
-    
-                a   {
-                    font-size: small;
-                    color: variables.$greenDarker;
-                    padding-left: 10px;
-                    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
-    
-                    &::before {
-                        content: "#";
-                        padding-right: 5px;
-                    }                
-                }
-    
-                &:hover {
-                    transform: translateX(15px);
-                }
-            }
-        }
-    }
 
     .title {
         background-color: variables.$greenDarker;
@@ -180,13 +60,13 @@
     }
 
     nav {
-        background-color: #43523d;
+        background-color: variables.$greenDarker;
         font-family: 'Nokia 3410', sans-serif;
         background-size: 5px 5px;
         background-image:
             linear-gradient(to right, #485942 1px, transparent 1px),
             linear-gradient(to bottom, #485942 1px, transparent 1px);
-        color: #92c847;
+        color: variables.$greenLight;
         display: flex;
         flex-direction: column ;
 
@@ -202,11 +82,11 @@
             a {
                 display: flex;
                 gap: 5px;
-                color: #92c847;
+                color: variables.$greenLight;
 
                 div {
                     padding: 3px;
-                    background-color: #92c847;
+                    background-color: variables.$greenLight;
                     height: 30px;
                 }
 
@@ -235,13 +115,10 @@
                 display: flex;
                 flex-direction: column;
 
-                &>* {
-                    flex: 1 1 0;
-                }
-
                 a {
-                    color: #92c847;
+                    color: variables.$greenLight;
                     text-decoration: none;
+                    font-size: x-small;
                     display: flex;
                     flex-direction: column;
                     justify-content: space-evenly;
@@ -252,26 +129,6 @@
 
                     span {
                         text-align: center;
-                    }
-                }
-                
-                button {
-                    background: none;
-                    border: none;
-                    color: #92c847;
-                    text-decoration: none;
-                    display: flex;
-                    flex-direction: column;
-                    width: 100%;
-                    justify-content: space-evenly;
-
-                    div {
-                        margin: 0 auto;
-                    }
-
-                    span {
-                        margin: 0 auto;
-                        text-wrap: nowrap;
                     }
                 }
             }
@@ -282,7 +139,7 @@
 
     main {
         flex: 1;
-        color: #43523d;
+        color: variables.$greenDarker;
         padding: 5px;
         display: flex;
         flex-direction: column;
@@ -293,18 +150,18 @@
     }
 
     footer {
-        background-color: #43523d;
+        background-color: variables.$greenDarker;
         font-family: 'Nokia 3410', sans-serif;
         background-size: 5px 5px;
         background-image:
             linear-gradient(to right, #485942 1px, transparent 1px),
             linear-gradient(to bottom, #485942 1px, transparent 1px);
-        color: #92c847;
+        color: variables.$greenLight;
 
         padding: 15px;
 
         a {
-            color: #92c847;
+            color: variables.$greenLight;
         }
     }
 }

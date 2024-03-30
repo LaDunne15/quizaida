@@ -1,0 +1,122 @@
+@use 'variables';
+
+.log-in, .sign-up, .forgot-password {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    width: 300px;
+    justify-content: center;
+    align-self: center;
+
+    .section {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        p {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+
+            label {
+                padding-left: 10px;
+            }
+        }
+
+        span {
+            font-size: small;
+            padding-left: 20px;
+            display: block;
+        }
+
+        .data {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+
+            p {
+                display: flex;
+
+                label {
+
+                    &:first-child {
+                        font-size: xx-small;
+                        padding-left: 20px;
+                    }
+
+                    &:last-child {
+                        font-weight: bold;
+                    }
+                }
+            }
+        }
+
+        .input-data {
+
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+
+            p {
+                label {
+                    font-size: x-small;
+                }
+            }
+
+            .regenerate {
+                position: relative;
+                transform: translate(0, -65px);
+                width: 30px;
+                height: 30px;
+                align-self: self-end;
+            }
+        }
+
+        .buttons {
+
+            display: flex;
+            justify-content: flex-end;
+            gap: 5px;
+
+            >* {
+                flex: 1;
+            }
+
+            button {
+                background: none;
+                text-decoration: underline;
+                text-shadow: 1px 1px 1.5px black;
+                transition: 0.25s ease-in-out;
+            }
+        }
+    }
+
+    .links {
+
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        li {
+
+            transition: 0.25s ease-in-out;
+
+            a   {
+                font-size: small;
+                color: variables.$greenDarker;
+                padding-left: 10px;
+                text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+
+                &::before {
+                    content: "#";
+                    padding-right: 5px;
+                }                
+            }
+
+            &:hover {
+                transform: translateX(15px);
+            }
+        }
+    }
+}

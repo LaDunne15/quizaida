@@ -1,11 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import emailjs from '@emailjs/browser';
 import { useRouter } from "next/navigation";
 import { validationService } from "../../../libs/validationService";
 import { generationService } from "../../../libs/generationService";
 import Link from "next/link";
-//import "../../../static/styles/sign-up.style.scss";
 
 export default () => {
 
