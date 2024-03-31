@@ -14,32 +14,23 @@ export async function GET(req) {
 
         const token = await verifyJwtToken(req.cookies.get('token')?.value);
 
-        if (token) {
+        if (!token) throw new Error("Unauthorized");
+        const user = await User.findById(token.id);
+        if (!user) throw new Error("User not found");
 
-            const user = await User.findById(token.id);
+        return NextResponse.json({
+            user,
+            statusText: "User found"
+        }, {
+            status: 200
+        });
 
-            return NextResponse.json({
-                user
-            }, {
-                status: 200,
-                headers: { "content-type": "application/json" }
-            });
-
-        } else {
-
-            return NextResponse.json({
-                success: "Є контанк"
-            }, {
-                status: 200,
-                headers: { "content-type": "application/json" }
-            });
-
-        }
     } catch (err) {
 
-        return NextResponse.json({}, {
-            status: 400,
-            statusText: `Error ${err}`
+        return NextResponse.json({
+            statusText: err.message
+        }, {
+            status: 400
         });
 
     }

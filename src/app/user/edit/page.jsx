@@ -95,13 +95,7 @@ export default () => {
         })
     }
 
-    const Logout = () => {
-        
-        const cookies = new Cookies();
-        cookies.set('token', "");
-
-        router.push("/");
-    }
+    
 
     if (isLoading) {
         return <p>Loading...</p>
@@ -156,9 +150,6 @@ export default () => {
                 <button type="submit">Delete</button>
             </form>
 
-            <button onClick={Logout}>
-                <span>Log Out</span>
-            </button>
         </div>
     )
 }
