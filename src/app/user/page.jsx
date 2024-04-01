@@ -53,26 +53,31 @@ export default () => {
     return (
         <div className="cabinet">
             <h1 className="title">My cabinet</h1>
-            <div className="data">
-                <ul>
-                    <li>
+            <div className="section">
+                <div className="data">
+                    <p>
                         <label>ID:</label>
-                        <span>{user._id}</span>
-                    </li>
-                    <li>
+                        <label>{user._id}</label>
+                    </p>
+                    <p>
                         <label>Name:</label>
-                        <span>{user.firstname} {user.lastname}</span>
-                    </li>
-                    <li>
+                        <label>{user.firstname} {user.lastname}</label>
+                    </p>
+                    <p>
                         <label>Email:</label>
                         <Link href={`mailto:${user.email}`}><span>{user.email}</span></Link>
+                    </p>
+                </div>
+                <span>{ message }</span>
+                <ul className="links">
+                    <li>
+                        <Link href="/user/edit">Change data</Link>
+                    </li>
+                    <li>
+                        <Link href="/" onClick={Logout}>Log Out</Link>
                     </li>
                 </ul>
-                <Link href="/user/edit" className="edit-link">Change data</Link>
             </div>
-            <span>{ message }</span>
-            
-            <input type="button" onClick={Logout} value="Log Out"/>
         </div>
     )
 }

@@ -28,71 +28,75 @@ export default () => {
 
     useEffect(()=>{
 
-        fetch("/api/auth/login",{
-            method: "GET"
-        }).then(i=>{
-            if(i.ok) {
+        const fetchData = async () => {
+            try {
+                const response = await fetch("/api/auth/login",{ method: "GET" });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.statusText);
                 setIsLoading(false);
-                return i.json();
-            } else {
-                setMessage(`${i.status} - ${i.statusText}`);
+                setUser(data.user);
+            } catch (err) {
+                setMessage(err.message);
             }
-        }).then(result=>{
-            setUser(result.user);
-        });
+        }
+        fetchData();
 
     },[]);
 
-    const saveChanges = async (e) => {
-        await fetch("/api/auth/login", {
-            method: "PUT", 
-            body: JSON.stringify({
-                user
-            })
-        }).then(i => {
-            if (i.ok) {
-                router.push("/user");
-                return i.json();
-            } else {
-                setMessage(`${i.status} - ${i.statusText}`);
-            }
-        })
+    const saveChanges = async () => {
+        try {
+            const response = await fetch("/api/auth/login", {
+                method: "PUT", 
+                body: JSON.stringify({
+                    user
+                })
+            });
+            const data = await response.json();
+
+            if (!response.ok) throw new Error(data.statusText);
+            router.push("/user");
+        } catch (err) {
+            setMessage(err.message);
+        }
     }
 
     const changePassword = async () => {
-        await fetch('/api/auth/forgotPassword', {
-            method: "PUT",
-            body: JSON.stringify({
-                email: user.email,
-                password,
-                password2
-            })
-        }).then(i => {
-            if (i.ok) {
-                router.push("/user");
-                return i.json();
-            } else {
-                setMessage2(`${i.status} - ${i.statusText}`);
-            }
-        })
+        try {
+            const response = await fetch('/api/auth/forgotPassword', {
+                method: "PUT",
+                body: JSON.stringify({
+                    email: user.email,
+                    password,
+                    password2
+                })
+            });
+            const data = await response.json();
+
+            if(!response.ok) throw new Error(data.statusText);
+            router.push("/user");
+        } catch (err) {
+            setMessage2(err.message);
+        }
     }
 
     const deleteAccount = async () => {
-        await fetch('/api/auth/login', {
-            method: "DELETE",
-            body: JSON.stringify({
-                passwordToCorfirm
-            })
-        }).then(i => {
-            if (i.ok) {
-                const cookies = new Cookies();
-                cookies.remove('token');
-                router.push("/");
-                return i.json();
-            } else {
-                setMessage3(`${i.status} - ${i.statusText}`);
-            }
-        })
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: "DELETE",
+                body: JSON.stringify({
+                    passwordToCorfirm
+                })
+            });
+            const data = await response.json();
+
+            if(!response.ok) throw new Error(data.statusText);
+
+            const cookies = new Cookies();
+            cookies.remove('token');
+            router.push("/");
+        } catch (err) {
+            setMessage3(err.message);
+        }
     }
 
     
@@ -102,52 +106,72 @@ export default () => {
     }
 
     return (
-        <div>
-            <p>My cabinet</p>
-            <p>ID: {user._id}</p>
-            <p>Email: {user.email}</p>
-
-            <form action={saveChanges}>
-                <div>
-                    <p>Firstname</p>
-                    <input type="text" name="firstname" defaultValue={user.firstname} onChange={(e)=>setUser({...user,firstname:e.target.value})} />
+        <div className="cabinet-edit">
+            
+            <ul className="links">
+                <li>
+                    <Link href="/user">Back</Link>
+                </li>
+            </ul>
+            <h1 className="title">Change user profile</h1>
+            <form action={saveChanges} className="section">
+                <div className="data">
+                    <p>
+                        <label>ID:</label>
+                        <label>{user._id}</label>
+                    </p>
+                    <p>
+                        <label>Email:</label>
+                        <label>{user.email}</label>
+                    </p>
                 </div>
-                <div>
-                    <p>Lastname</p>
-                    <input type="text" name="lastname" defaultValue={user.lastname} onChange={(e)=>setUser({...user,lastname:e.target.value})}/>
+                <h1 className="sub-title">Change users data</h1>
+                <div className="input-data">
+                    <p>
+                        <label>Firstname</label>
+                        <input type="text" name="firstname" defaultValue={user.firstname} onChange={(e)=>setUser({...user,firstname:e.target.value})} />
+                    </p>
+                    <p>
+                        <label>Lastname</label>
+                        <input type="text" name="lastname" defaultValue={user.lastname} onChange={(e)=>setUser({...user,lastname:e.target.value})}/>
+                    </p>
                 </div>
-                {
-                    message
-                }
-                <button type="submit">Save</button>
+                <span>{ message }</span>
+                <div className="buttons">
+                    <input type="submit" value="Save changes"/>
+                </div>
             </form>
 
-            <form action={changePassword}>
-                <span>Change password</span>
-                <div>
-                    <p>Password</p>
-                    <input type="password" autoComplete='on' onChange={(e)=>setPassword(e.target.value)}/>
+            <form action={changePassword} className="section">
+                <h1 className="sub-title">Change password</h1>
+                <div className="input-data">
+                    <p>
+                        <label>Password</label>
+                        <input type="password" autoComplete='on' onChange={(e)=>setPassword(e.target.value)}/>
+                    </p>
+                    <p>
+                        <label>Repeat password</label>
+                        <input type="password" autoComplete='on' onChange={(e)=>setPassword2(e.target.value)}/>
+                    </p>
                 </div>
-                <div>
-                    <p>Repeat password</p>
-                    <input type="password" autoComplete='on' onChange={(e)=>setPassword2(e.target.value)}/>
+                <span>{ message2 }</span>
+                <div className="buttons">
+                    <input type="submit" value="Save password"/>
                 </div>
-                {
-                    message2
-                }
-                <button type="submit">Change password</button>
             </form>
 
-            <form action={deleteAccount}>
-                <span>Delete account</span>
-                <div>
-                    <span>Input password to delete account:</span>
-                    <input type="password" autoComplete='on' onChange={(e)=>setPasswordToCorfirm(e.target.value)} />
+            <form action={deleteAccount} className="section">
+                <h1 className="sub-title">Delete Account</h1>
+                <div className="input-data">
+                    <p>
+                        <label>Confirm your password:</label>
+                        <input type="password" autoComplete='on' onChange={(e)=>setPasswordToCorfirm(e.target.value)} />
+                    </p>
                 </div>
-                {
-                    message3
-                }
-                <button type="submit">Delete</button>
+                <span>{ message3 }</span>
+                <div className="buttons">
+                    <input type="submit" value="Delete account"/>
+                </div>
             </form>
 
         </div>

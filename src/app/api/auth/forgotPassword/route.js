@@ -78,45 +78,41 @@ export async function POST(req) {
 export async function PUT(request) {
 
     try {
+
         const body = await request.json();
         const token = await verifyJwtToken(request.cookies.get('token')?.value);
 
-        if(token.email == body.email) {
-            const hashPassword = (pass, saltRounds = 10) => {
-                try {
-                    return bcrypt.hashSync(pass, saltRounds);
-                } catch (error) {
-                    console.error('Password hashing failed:', error);
-                    throw new Error('Password hashing failed');
-                }
-            };
-
-            const hashedPass2 = hashPassword(body.password2, 10);
-
-            if(bcrypt.compareSync(body.password,hashedPass2)) {
-
-                const newPassword = hashPassword(body.password, 10);
-
-                const user = await User.findOneAndUpdate(
-                    { email: body.email }, 
-                    { password: newPassword }
-                );
-
-                return NextResponse.json({},{
-                    status: 201,
-                    statusText: "Updated password"
-                });
-            } else {
-                throw new Error("Passwords do not match");
+        if(token.email != body.email) throw new Error ("Not your account");        
+        const hashPassword = (pass, saltRounds = 10) => {
+            try {
+                return bcrypt.hashSync(pass, saltRounds);
+            } catch (error) {
+                throw new Error('Password hashing failed');
             }
-        } else {
-            throw new Error("Not your account");
-        }
+        };
+        const hashedPass2 = hashPassword(body.password2, 10);
+
+        if(!bcrypt.compareSync(body.password,hashedPass2)) throw new Error ("Passwords do not match");
+    
+        const newPassword = hashPassword(body.password, 10);
+
+        await User.findOneAndUpdate({
+            email: body.email 
+        }, { 
+            password: newPassword 
+        });
+
+        return NextResponse.json({
+            statusText: "Updated password"
+        },{
+            status: 201
+        });
     }
-    catch (error) {
-        return NextResponse.json({},{
-            status: 401,
-            statusText: `Error ${error}`
+    catch (err) {
+        return NextResponse.json({
+            statusText: err.message
+        },{
+            status: 400
         })
     }
 }

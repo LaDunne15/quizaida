@@ -82,18 +82,25 @@ export async function PUT(req) {
 
         const body = await req.json();
         const token = await verifyJwtToken(req.cookies.get('token')?.value);
-        if (token.id == body.user._id) {
-            await User.findByIdAndUpdate(token.id, {
-                firstname: body.user.firstname,
-                lastname: body.user.lastname
-            });
-            return NextResponse.json({ success: true }, { status: 200, statusText: "Updated" });
-        } else {
-            throw new Error("Unauthorized");
-        }
 
-    } catch (error) {
-        return NextResponse.json({ success: false }, { status: 400, statusText: `Error ${error}` });       
+        if (token.id != body.user._id) throw new Error("Not permitted to update this user");
+
+        await User.findByIdAndUpdate(token.id, {
+            firstname: body.user.firstname,
+            lastname: body.user.lastname
+        });
+        return NextResponse.json({ 
+            statusText: "Updated"
+        }, { 
+            status: 200
+        });
+
+    } catch (err) {
+        return NextResponse.json({
+            statusText: err.message
+        }, { 
+            status: 400
+        });       
     }
 }
 
@@ -104,15 +111,21 @@ export async function DELETE(req) {
 
         const user = await User.findById(token.id);
 
-        if(bcrypt.compareSync(body.passwordToCorfirm,user.password)) {
-            await User.findByIdAndDelete(token.id);
-            return NextResponse.json({ success: true }, { status: 200, statusText: "Deleted" });
-        } else {
-            throw new Error("Wrong password");
-        }
+        if(!bcrypt.compareSync(body.passwordToCorfirm,user.password)) throw new Error("Wrong password");
 
-    } catch (error) {
-        return NextResponse.json({ success: false }, { status: 400, statusText: `Error ${error}` });       
+        await User.findByIdAndDelete(token.id);
+        return NextResponse.json({
+            statusText: "Deleted"
+        }, {
+            status: 200
+        });
+
+    } catch (err) {
+        return NextResponse.json({ 
+            statusText: err.message
+        }, {
+            status: 400
+        });       
     }
 }
 

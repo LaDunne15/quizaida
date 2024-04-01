@@ -2,7 +2,6 @@
 @import "./reset.css";
 @import url('https://fonts.cdnfonts.com/css/nokia-3410');
 @import "./auth-forms.scss";
-@import "./cabinet.scss";
 
 * {
     font-family: 'Nokia 3410', sans-serif;
@@ -33,6 +32,21 @@
         font-weight: bold;
         text-align: center;
         box-shadow: 1px 1px 1.5px black;
+    }
+
+    .sub-title {
+        background-color: variables.$greenLight;
+        background-size: 5px 5px;
+        background-image:
+            linear-gradient(to right, variables.$greenLightDark 1px, transparent 1px),
+            linear-gradient(to bottom, variables.$greenLightDark 1px, transparent 1px);
+        
+        padding: 5px;
+        color: variables.$greenDark;
+        font-size: small;
+        font-weight: bold;
+        text-align: center;
+        border: 1px solid variables.$greenLightDark;
     }
 
     input[type="text"], input[type="number"], input[type="password"] {
