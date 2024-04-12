@@ -4,6 +4,16 @@ $greenLightDark: #799f43;
 $greenDark:#485942;
 $greenDarker:#43523d;
 
+@mixin background-net {
+    background-size: 5px 5px;
+    background-image:
+        linear-gradient(to right, $greenLightDark 1px, transparent 1px),
+        linear-gradient(to bottom, $greenLightDark 1px, transparent 1px);
+    color: $greenDark;
+}
+
+$background-net: linear-gradient(to right, #799f43 1px, transparent 1px), linear-gradient(to bottom, #799f43 1px, transparent 1px);
+
 :export {
     $greenLight: $greenLight;
     $greenDark: $greenDark;
