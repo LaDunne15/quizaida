@@ -9,13 +9,17 @@ import { v4 as uuidv4 } from 'uuid';
 import ImageInput from "../../../components/image";
 import { validationService } from "../../../libs/validationService.js";
 import ImagesInput from "../../../components/images";
-import Answer from "../../../components/answer";
+import Answer from "../../../components/test/answer";
+import InputAnswer from "../../../components/test/input-answer";
+import Question from "../../../components/test/question";
+import InputQuestion from "../../../components/test/input-question";
 
 export default function CreateTest() {
+    
+    const getId = () => uuidv4();
+    const first_id = "92b59cd8-d2f4-49ec-8dbc-f2ee41bf74b8";
 
     const auth = useAuth();
-
-    const first_id = "92b59cd8-d2f4-49ec-8dbc-f2ee41bf74b8";
 
     const [theme, setTheme] = useState("");
     const [sourses, setSourses] = useState([]);
@@ -30,25 +34,15 @@ export default function CreateTest() {
         photo: [],
         answer: [],
         comment: "",
-        sourse: ""
-    }
-    const getId = () => uuidv4();
-
-
-    const clearAnswer = {
-        correct: false,
-        text: "",
-        photo: "",
+        sourse: "",
         fake_id:first_id
     }
 
+    const [focusQuestion, setFocusQuestion] = useState(null);
     const [question, setQuestion] = useState(clearQuestion);
 
-    const [focusAnswer, setFocusAnswer] = useState(null);
-    
     const [questions, setQuestions] = useState([]);
 
-    const [answer, setAnswer] = useState(clearAnswer);
 
     const createTest = async () => {
 
@@ -116,21 +110,22 @@ export default function CreateTest() {
         }
     }
 
+    
     useEffect(()=>{
-        if (answer.text || answer.photo) {
-            if (question.answer.find(i=>i.fake_id==focusAnswer)) {
-                setQuestion({...question,answer:question.answer.map(i=>i.fake_id==focusAnswer?answer:i)});
+        if (question.text) {
+            if (questions.find(i=>i.fake_id==focusQuestion)) {
+                setQuestions(questions.map(i=>i.fake_id==focusQuestion?question:i));
             } else {
-                setQuestion({...question,answer:[...question.answer,answer]});
+                setQuestions([...questions,question]);
             }
         } else {
-            if (!question.answer.find(i=>i.fake_id==focusAnswer)) {
-                setQuestion({...question,answer:[...question.answer,answer]});
+            if (!questions.find(i=>i.fake_id==focusQuestion)) {
+                setQuestions([...questions,question]);
             }
         }
-        setFocusAnswer(answer.fake_id);
+        setFocusQuestion(question.fake_id);
 
-    }, [answer]);
+    }, [question]);
     
     return (
         <form action={createTest} className="create-test-block">
@@ -182,119 +177,34 @@ export default function CreateTest() {
                 <h2 className="sub-title">Questions</h2>
                 <ul className="questions-list">
                     {
-                        questions.map((s,index)=>
-                            <li key={index} className="question">
-                                <div className="question-header">
-                                    <div className="question-text">
-                                        <span>{s.text}</span>
-                                        <input type="button" value="X" className="close-btn" onClick={() =>{setQuestions([...questions.filter(el=>el!=s)])}}/>
-                                    </div>
-                                    <div className="question-image">
-                                        {   
-                                            s.photo.map((i,index2)=><Image
-                                                key={index2}
-                                                src={URL.createObjectURL(i)}
-                                                alt="Downloaded"
-                                                width={100}
-                                                height={100}
-                                            />)
-                                        }
-                                    </div>
-                                </div>
-                                <ul className="answers">
-                                    {
-                                        s.answer.map((a,index3)=><li key={index3} className={`answer ${a.correct?"correct":""}`}>
-                                            <h5>{a.text}</h5>
-                                            {
-                                                a.photo && <Image
-                                                style={{
-                                                objectFit: "cover"
-                                                }}
-                                                src={URL.createObjectURL(a.photo)}
-                                                alt="Downloaded"
-                                                width={100}
-                                                height={100}
-                                                />
-                                            }
-                                        </li>)
-                                    }
-                                </ul>
-                                <div className="comment-sourse">
-                                    { s.comment && <p>Comment: <i>{s.comment}</i></p>}
-                                    { s.sourse && <Link href={s.sourse}>[Source]</Link> }
-                                </div>
-                            </li>)
+                        questions.map((q,index)=>{
+                            if(q.fake_id == focusQuestion) {
+                                return <InputQuestion key={index} question={question} setQuestion={setQuestion} addQuestion={addQuestion}/>
+                            } else {
+                                return <Question key={index} question={q} 
+                                    setQuestions={()=>{
+                                        setQuestions([...questions.filter(el=>el!=q)]);
+                                    }}
+                                    onClick={()=>{
+                                        setFocusQuestion(q.fake_id);
+                                        setQuestion(q);
+                                    }}
+                                />
+                            }
+                        })
                     }
                 </ul>
-                <div className="add-question">
-                    <div className="question-block">
-                        <label>Add Question</label>
-                        <div className="input-data">
-                            <p>
-                                <label>Text:</label>
-                                <textarea type="text" placeholder="Input text..." value={question.text || ""} name="" id="" onChange={(e)=>setQuestion({...question,text:e.target.value})}/>
-                            </p>
-                        </div>
-                        <ImagesInput images={question.photo} setImages={(files) => setQuestion({...question,photo:[...files]})}/>
-                        <div className="input-data">
-                            <p>
-                                <label>Comment:</label>
-                                <input type="text" name="" id="" onChange={(e)=>setQuestion({...question,comment:e.target.value})}/>
-                            </p>
-                            <p>
-                                <label>Source:</label>
-                                <input type="text" name="" id="" onChange={(e)=>setQuestion({...question,sourse:e.target.value})}/>
-                            </p>
-                        </div>
-                    </div>
-                    <div className="answers-block">
-                        <div className="answers">
-                            <label className="sub-sub-title">Answers:</label>
-                            <ul>
-                            {
-                                question.answer.map((a, index) => {
-                                    if (a.fake_id == focusAnswer) {
-                                        return (
-                                            <div className="add-answer" key={index}>
-                                                <div>
-                                                    <ImageInput image={answer.photo} setImage={(file)=>{setAnswer({...answer,photo:file})}} />
-                                                    <div className="input-data">
-                                                        <p>
-                                                            <label>Text:</label> 
-                                                            <textarea type="text" name="" id="" value={answer.text||""} onChange={(e)=>setAnswer({...answer,text:e.target.value})}/>
-                                                        </p>
-                                                        <p>
-                                                            <label>Correct:</label>
-                                                            <input type="checkbox" name="" id="" checked={answer.correct||""} onChange={(e)=>setAnswer({...answer,correct:e.target.checked})}/>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )
-                                    } else {
-                                        return (<Answer key={index} answer={a} 
-                                            deleteAnswer={()=>
-                                                setQuestion({...question,answer:[...question.answer.filter(el=>el!==a)]})
-                                            }
-                                            onClick={() => {
-                                                setFocusAnswer(a.fake_id);
-                                                setAnswer(a);
-                                            }}/>
-                                        );
-                                    }
-                                })
-                            }
-                                <input type="button" value="+" onClick={() => {
-                                    const id = getId();
-                                    setFocusAnswer(id);
-                                    setAnswer({correct:false,text:"",photo:"",fake_id:id});
-                                }}/>
-                            </ul>
-                        </div>
-                    </div>
-                    <input type="button" value="Add Question" onClick={addQuestion}/>
-                </div>
+                <input type="button" value="Add Question" onClick={()=>{
+                    const id = getId();
+                    setFocusQuestion(id);
+                    setQuestion({...clearQuestion, fake_id:id});
+                }}/>
             </div>
+            <pre>
+                {
+                    JSON.stringify({theme, sourses, description, type, questions},null,4)
+                }
+            </pre>
             {
                 message
             }

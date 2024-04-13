@@ -19,7 +19,7 @@ export default ({answer, deleteAnswer, onClick}) => {
             </div>
             <input type="button" value="X" 
                 className="close-btn"
-                onClick={() =>{deleteAnswer()}} 
+                onClick={deleteAnswer} 
             />
         </li>
     )
