@@ -39,59 +39,64 @@ export default function CreateTest() {
     }
 
     const [focusQuestion, setFocusQuestion] = useState(null);
-    const [question, setQuestion] = useState(clearQuestion);
+    const [question, setQuestion] = useState(null);
 
     const [questions, setQuestions] = useState([]);
 
 
     const createTest = async () => {
 
-        let formData = new FormData();
+        try {
 
-        const _questions = questions.map((i)=>{
-            const photo = i.photo.map(j=>{
-                const idPhoto = uuidv4();
-                formData.append(`${idPhoto}`,j);
-                return idPhoto;
+            let formData = new FormData();
+
+            const _questions = questions.map((i)=>{
+                const photo = i.photo.map(j=>{
+                    const idPhoto = uuidv4();
+                    formData.append(`${idPhoto}`,j);
+                    return idPhoto;
+                });
+                const answer = i.answer.map(j=>{
+                    const idPhoto = uuidv4();
+                    formData.append(`${idPhoto}`,j.photo);
+                    return {...j, photo: idPhoto}
+                });
+                return {...i, photo, answer };
             });
-            const answer = i.answer.map(j=>{
+            
+            let newImageFilename = "";
+    
+            if (mainImage != null) {
                 const idPhoto = uuidv4();
-                formData.append(`${idPhoto}`,j.photo);
-                return {...j, photo: idPhoto}
-            });
-            return {...i, photo, answer };
-        });
-        
-        let newImageFilename = "";
-
-        if (mainImage != null) {
-            const idPhoto = uuidv4();
-            formData.append(`${idPhoto}`,mainImage);
-            newImageFilename = idPhoto;
-        }
-
-        formData.append('test', JSON.stringify({
-            author: auth.id,
-            mainImage: newImageFilename,
-            theme,
-            sourses,
-            description,
-            type,
-            questions: _questions
-        }));
-        
-        await fetch('/api/test',{
-            method: "POST",
-            body: formData
-        }).then(i=>{
-            if(i.ok) {
-                return i.json();
-            } else {
-                setMessage(`${i.status} - ${i.statusText}`);
+                formData.append(`${idPhoto}`,mainImage);
+                newImageFilename = idPhoto;
             }
-        }).then(res=>{
-            redirect(`/test/${res.newTest._id}`);
-        });
+    
+            formData.append('test', JSON.stringify({
+                author: auth.id,
+                mainImage: newImageFilename,
+                theme,
+                sourses,
+                description,
+                type,
+                questions: _questions
+            }));
+
+            const response = await fetch('/api/test', {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) throw new Error(data.statusText);
+
+            //redirect(`/test/${res.newTest._id}`);
+
+
+        } catch (err) {
+            setMessage(err.message);
+        }
     }
 
 
@@ -112,16 +117,11 @@ export default function CreateTest() {
 
     
     useEffect(()=>{
-        if (question.text) {
-            if (questions.find(i=>i.fake_id==focusQuestion)) {
-                setQuestions(questions.map(i=>i.fake_id==focusQuestion?question:i));
-            } else {
-                setQuestions([...questions,question]);
-            }
+        if (!question) return;
+        if (questions.find(i=>i.fake_id==focusQuestion)) {
+            setQuestions(questions.map(i=>i.fake_id==focusQuestion?question:i));
         } else {
-            if (!questions.find(i=>i.fake_id==focusQuestion)) {
-                setQuestions([...questions,question]);
-            }
+            setQuestions([...questions,question]);
         }
         setFocusQuestion(question.fake_id);
 

@@ -6,33 +6,29 @@ import { useEffect, useState } from "react";
 export default ({question, setQuestion}) => {
 
     const getId = () => uuidv4();
-    const first_id = "92b59cd8-d2f4-49ec-8dbc-f2ee41bf74b8";
 
-    const clearAnswer = {
-        correct: false,
-        text: "",
-        photo: "",
-        fake_id:first_id
+    const clearAnswer = () => {
+        return {
+            correct: false,
+            text: "",
+            photo: "",
+            fake_id: getId()
+        }
     }
     
     const [focusAnswer, setFocusAnswer] = useState(null);
-    const [answer, setAnswer] = useState(clearAnswer);
+    const [answer, setAnswer] = useState(null);
 
 
     useEffect(()=>{
-        if (answer.text || answer.photo) {
-            if (question.answer.find(i=>i.fake_id==focusAnswer)) {
-                setQuestion({...question,answer:question.answer.map(i=>i.fake_id==focusAnswer?answer:i)});
-            } else {
-                setQuestion({...question,answer:[...question.answer,answer]});
-            }
+        if (!answer) return;
+        if(question.answer.find(i=>i.fake_id==focusAnswer)) {
+            setQuestion({...question,answer:question.answer.map(i=>i.fake_id==focusAnswer?answer:i)});
+            setFocusAnswer(answer.fake_id);
         } else {
-            if (!question.answer.find(i=>i.fake_id==focusAnswer)) {
-                setQuestion({...question,answer:[...question.answer,answer]});
-            }
-        }
-        setFocusAnswer(answer.fake_id);
-
+            setQuestion({...question,answer:[...question.answer,answer]});
+            setFocusAnswer(answer.fake_id);
+        }   
     }, [answer]);
 
     return (
@@ -42,7 +38,7 @@ export default ({question, setQuestion}) => {
                 <div className="input-data">
                     <p>
                         <label>Text:</label>
-                        <textarea type="text" placeholder="Input text..." value={question.text || ""} name="" id="" onChange={(e)=>setQuestion({...question,text:e.target.value})}/>
+                        <textarea type="text" placeholder="Input text..." defaultValue={question.text} name="" id="" onChange={(e)=>setQuestion({...question,text:e.target.value})}/>
                     </p>
                 </div>
                 <ImagesInput images={question.photo} setImages={(files) => setQuestion({...question,photo:[...files]})}/>
@@ -79,9 +75,9 @@ export default ({question, setQuestion}) => {
                             })
                         }
                         <input type="button" value="+" onClick={() => {
-                            const id = getId();
-                            setFocusAnswer(id);
-                            setAnswer({correct:false,text:"",photo:"",fake_id:id});
+                            const newAnswer = clearAnswer();
+                            setFocusAnswer(newAnswer.fake_id);
+                            setAnswer(newAnswer);
                         }}/>
                     </ul>
                 </div>

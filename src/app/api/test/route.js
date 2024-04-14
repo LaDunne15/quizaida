@@ -87,6 +87,8 @@ export async function POST(request) {
         const formData = await request.formData();
         const file = JSON.parse(formData.get('test'));
 
+        console.log(file);
+
         const questions = file.questions.map((i)=>{
 
             const photo = i.photo.map((p)=>{
