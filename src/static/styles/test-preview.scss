@@ -1,0 +1,136 @@
+@use 'variables';
+
+.test-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .test-header {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+
+        .main-data {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+
+            .visibility-time {
+                font-size: small;
+                padding: 0px 15px;
+                font-style: italic;
+
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            .author {
+                font-size: medium;
+                padding-left: 10px;
+            }
+
+            .description {
+                flex: 1;
+                border: 2px solid variables.$greenLightDark;
+                padding: 3px;
+            }
+        }
+    }
+
+    .sources {
+        ul {
+            display: flex;
+            flex-direction: column;
+            padding: 3px 3px 3px 15px;
+            gap: 5px;
+
+            li {
+
+                &::marker {
+                    content: "-";
+                }
+
+                a {
+                    padding-left: 5px;
+                    color: variables.$greenDarker;
+                }
+            }
+        }
+    }
+
+    .rating {
+
+        display: flex;
+        gap: 5px;
+        justify-content: flex-end;
+
+        .total {
+            min-width: 50px;
+            text-align: end;
+            align-self: center;
+        }
+
+        img:last-child {
+            transform: rotate(180deg);
+        }
+    }
+
+    .manage-test {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        gap: 5px;
+
+        a {
+            color: variables.$greenDarker;
+            align-self: center;
+
+            &::before {
+                content: '#';
+            }
+        }
+
+        input[type="button"] {
+            background: none;
+            color: variables.$greenDarker;
+            text-decoration: none;
+            border: 2px solid variables.$greenDarker;
+        }
+    }
+
+    .start-test {
+
+        display: flex;
+        justify-content: center;
+
+        p {
+            flex: 1;
+            text-align: center;
+            border: 2px solid variables.$greenLightDark;
+            padding: 10px;
+
+            a {
+                color: variables.$greenDarker;
+
+                &::before {
+                    content: '#';
+                }
+            }
+        }
+
+        input[type="button"] {
+            flex: 1;
+        }
+    }
+}
+
+
+@media screen and (min-width: 426px) {
+    .test-preview {
+        .test-header {
+            flex-direction: row;
+        }
+    }
+}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../../hooks/useAuth";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { v4 as uuidv4 } from 'uuid';
 import ImageInput from "../../../components/image";
@@ -43,6 +44,7 @@ export default function CreateTest() {
 
     const [questions, setQuestions] = useState([]);
 
+    const router = useRouter();
 
     const createTest = async () => {
 
@@ -91,10 +93,11 @@ export default function CreateTest() {
 
             if (!response.ok) throw new Error(data.statusText);
 
-            //redirect(`/test/${res.newTest._id}`);
+            router.push(`/test/${data.newTest._id}`);
 
 
         } catch (err) {
+            console.log(err);
             setMessage(err.message);
         }
     }
@@ -200,14 +203,7 @@ export default function CreateTest() {
                     setQuestion({...clearQuestion, fake_id:id});
                 }}/>
             </div>
-            <pre>
-                {
-                    JSON.stringify({theme, sourses, description, type, questions},null,4)
-                }
-            </pre>
-            {
-                message
-            }
+            <p> {message} </p>
             <input type="submit" value="Complete Question"/>
         </form>
     );

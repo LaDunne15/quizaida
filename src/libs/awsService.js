@@ -1,11 +1,17 @@
 import AWS from "aws-sdk";
-import { v4 as uuidv4 } from 'uuid';
+import sharp from "sharp";
 import { NextResponse } from "next/server";
 
 class AWSService {
 
     async uploadFile(file, filename) {
+
         const buffer = Buffer.from(await file.arrayBuffer());
+
+        const convertedBuffer = await sharp(buffer)
+            .toFormat('png') // Перетворюємо на PNG
+            .png({ compressionLevel: 9 }) // Стискаємо зображення
+            .toBuffer();
 
         AWS.config.update({
             accessKeyId: process.env.ACCESS_KEY_ID,
@@ -24,9 +30,10 @@ class AWSService {
 
         s3.upload(params, (err, data) => {
             if (err) {
-                return NextResponse.json({},{
-                    status: 400,
-                    statusText: `Error ${err}`
+                return NextResponse.json({
+                    statusText: err.message
+                },{
+                    status: 400
                 });
             } else {
                 return this.getFileLink(filename);

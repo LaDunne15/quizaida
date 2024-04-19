@@ -12,70 +12,65 @@ connect();
 
 export async function GET(req) {
 
-    const id = req.nextUrl.searchParams.get("id");
-    const token = await verifyJwtToken(req.cookies.get('token')?.value);
-
     try {
-        if(token) {
-            if (id) {
-                const test = await Test.findById(id)
-                .populate({
-                    path: 'author',
-                    model: User
-                }).populate({
-                    path: 'question',
-                    model: Question
-                });
 
-                console.log(test);
+        const token = await verifyJwtToken(req.cookies.get('token')?.value);
 
-                const filter =test.rating.filter(i=>i.user.toString() === token.id);
+        if(!token) throw new Error("Unauthorized");
+        
+        const id = req.nextUrl.searchParams.get("id");
 
-                let liked = 0;
+        if (id) {
+            const test = await Test.findById(id).populate({
+                path: 'author'
+            }).populate({
+                path: 'question'
+            });
 
-                if( filter.length != 0 ) {
-                    liked = filter[0].kind === "LIKE" ? 1 : -1;
-                }
+            const filter = test.rating.filter(i=>i.user.toString() === token.id);
 
-                const response = await Response.findOne({
-                    status: "In process",
-                    executor: token.id,
-                    test: id
-                });
+            let liked = 0;
 
-                return NextResponse.json({
-                    test,
-                    isOwner: test.autor?test.author._id.toString() === token.id: false, 
-                    inProcess: !!response,
-                    responseId: response? response._id: null,
-                    liked
-                },{
-                    status: 200,
-                    statusText: "OK"
-                });
-            } else {
-                const tests = await Test.find({
-                    type: "PUBLIC" 
-                }).populate({
-                    path: 'author',
-                    model: User
-                });
-                return NextResponse.json({tests},{
-                    status: 200,
-                    statusText: "OK"
-                });
+            if( filter.length != 0 ) {
+                liked = filter[0].kind === "LIKE" ? 1 : -1;
             }
+
+            const response = await Response.findOne({
+                status: "In process",
+                executor: token.id,
+                test: id
+            });
+
+            return NextResponse.json({
+                test,
+                isOwner: test.author?test.author._id.toString() === token.id: false, 
+                inProcess: !!response,
+                responseId: response? response._id: null,
+                liked,
+                statusText: "OK"
+            },{
+                status: 200
+            });
             
         } else {
-            return NextResponse.json({},{
-                status: 401,
-                statusText: "Unauthorized"
-            })
+            const tests = await Test.find({
+                type: "PUBLIC" 
+            }).populate({
+                path: 'author',
+                model: User
+            });
+            return NextResponse.json({
+                tests,
+                statusText: "OK"
+            },{
+                status: 200
+            });
         }
     } catch (err) {
-        return NextResponse.json({},{
-            status: 400,
-            statusText: `Error ${err}`
+        return NextResponse.json({
+            statusText: err.message
+        },{
+            status: 400
         })
     }
 }
@@ -86,8 +81,6 @@ export async function POST(request) {
         
         const formData = await request.formData();
         const file = JSON.parse(formData.get('test'));
-
-        console.log(file);
 
         const questions = file.questions.map((i)=>{
 
@@ -133,16 +126,17 @@ export async function POST(request) {
 
         const result = await newTest.save();
     
-        return NextResponse.json({ newTest: result },{
-            status: 201,
-            statusText: "Created"
+        return NextResponse.json({ 
+            newTest: result
+         },{
+            status: 201
         });
 
     } catch (err) {
-
-        return NextResponse.json({},{
-            status: 400,
-            statusText: `Error ${err}`
+        return NextResponse.json({
+            statusText: err.message
+        },{
+            status: 400
         });
     }
 }

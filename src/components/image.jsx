@@ -1,6 +1,7 @@
 import Image from "next/image";
+import { memo } from "react";
 
-export default ({image, setImage}) => {
+export default memo(({image, setImage}) => {
     
     if (!image) return (
         <div className="add-image">
@@ -20,4 +21,4 @@ export default ({image, setImage}) => {
         </div>
     );
 
-}
+});

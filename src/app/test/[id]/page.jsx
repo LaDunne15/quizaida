@@ -2,8 +2,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { redirect, useRouter } from "next/navigation";
+import { validationService } from "../../../libs/validationService.js";
 //import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import noImage from "../../../static/icons/no-image.png";
+import rateActive from "../../../static/icons/rate-active.png";
+import rateInactive from "../../../static/icons/rate-inactive.png";
 
 export default function EditTest({params}) {
 
@@ -43,24 +47,27 @@ export default function EditTest({params}) {
     const [liked, setLiked] = useState(0);
 
     useEffect(()=>{
-        fetch(`/api/test?id=${params.id}`,{
-            method: "GET"
-        }).then(res=>{
-            if(res.ok) {
-                return res.json();
-            } else {
-                setMessage(`${res.status} - ${res.statusText}`);
+
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`/api/test?id=${params.id}`, { 
+                    method: "GET" 
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.statusText);
+                
+                setIsLoading(false);
+                setTest(data.test);
+                setIsOwner(data.isOwner);
+                setInProcess(data.inProcess);
+                setResponseId(data.responseId);
+                setLiked(data.liked);
+
+            } catch (err) {
+                setMessage(err.message);
             }
-        }).then(data=>{
-            setIsLoading(false);
-            setTest(data.test);
-            setIsOwner(data.isOwner);
-            setInProcess(data.inProcess);
-            setResponseId(data.responseId);
-            setLiked(data.liked);
-        }).catch(err=>{
-            console.log(err);
-        })
+        }
+        fetchData();
     },[]);
 
     const deleteTest = async () => {
@@ -123,90 +130,65 @@ export default function EditTest({params}) {
     }
 
     return (
-        <div>
-            <p>ID: {test._id}</p>
-            <p>Theme: {test.theme} ({test.type})</p>
+        <div className="test-preview">
+            <div className="test-header">
+                <div className="image">
+                    <Image
+                        style={{
+                            objectFit: "cover"
+                        }}
+                        src={test.mainImage?test.mainImage:noImage}
+                        alt="Downloaded"
+                        width={200}
+                        height={200}
+                    />
+                </div>
+                <div className="main-data">
+                    <h1 className="title">{test.theme}</h1>
+                    <div className="visibility-time">
+                         <label>{ test.type }</label>
+                         <label>{ validationService.determineTimePassed(test.created) }</label>
+                    </div>
+                    <div className="rating">
+                        <p className="total">{test.totalrating}</p>
+                        <Image src={liked==1?rateActive:rateInactive} onClick={()=>rate("LIKE")}  alt="star" width={25} height={25}/>
+                        <Image src={liked==-1?rateActive:rateInactive} onClick={()=>rate("DISLIKE")}  alt="star" width={25} height={25}/>
+                    </div>
+                    <p className="author">
+                        {
+                            test.author? `${test.author.firstname} ${test.author.lastname}`:`Deleted author`
+                        }
+                    </p>
+                    {
+                        test.description && <p className="description">{test.description}</p>
+                    }
+                </div>
+            </div>
             {
-                test.mainImage && <Image
-                style={{
-                    objectFit: "cover"
-                }}
-                src={test.mainImage}
-                alt="Downloaded"
-                width={100}
-                height={100}
-                />
+                test.sourse.length>0 && <div className="sources">
+                    <h2 className="sub-title">Sources</h2>
+                    <ul>
+                        {
+                            test.sourse.map(s=><li key={s}><Link href={s} target="_blank" rel="noopener noreferrer">{s}</Link></li>)
+                        }
+                    </ul>
+                </div>
             }
-            <p>Description: {test.description}</p>
-            <p>
-                Author:
+            {
+                isOwner && <div className="manage-test">
+                    <Link href={`/test/editTest/${test._id}`}>Edit</Link>
+                    <input type="button" value="Delete" onClick={deleteTest}/>
+                </div>
+            }
+            <div className="start-test">
                 {
-                    test.author? `${test.author.firstname} ${test.author.lastname}`:<p>DELETED</p>
-                }
-            </p>
-            <div>
-                <p>Sourses</p>
-                {
-                    test.sourse.map((s,index)=>
-                        <a key={s} href={s} target="_blank" rel="noopener noreferrer">[{`Link ${index+1}`}]</a>
-                    )
+                    inProcess? <p>In process <Link href={`/response/${responseId}`}>Continue</Link></p>:
+                    <input type="button" value="Start test" onClick={startTest}/>
                 }
             </div>
-            <div>
-                Likes: {test.totalrating}
-                <button onClick={()=>rate("LIKE")}>Like</button>
-                <button onClick={()=>rate("DISLIKE")}>Dislike</button>
-                {
-                    liked
-                }
-            </div>
-            <p>
-                Created: {test.created}
-            </p>
-            {
-            /*
-            <ul>
-                <p>Questions: </p>
-                {
-                    test.question.map((q)=><li key={q._id}>
-                        <p>{q.text}</p>
-                        <ol>
-                            {
-                                q.answer.map((a,index2)=><li key={index2}>
-                                    <p>{a.text}</p>
-                                    <p>{a.photo}</p>
-                                </li>)
-                            }
-                        </ol>
-                        <a href={q.source}>{q.source}</a>
-                        <i>{q.comment}</i>
-                    </li>)
-                }
-            </ul>
-            */
-            }
             {
                 message
             }
-            {
-                isOwner && <div>
-                    <Link href={`/test/editTest/${test._id}`}>Edit</Link>
-                    <button onClick={deleteTest}>Delete</button>
-                </div>
-            }
-            <div>
-            {
-                inProcess? <>
-                    <p>In process <Link href={`/response/${responseId}`}>Continue</Link></p>
-                </>:
-                <button onClick={startTest}>Start Test</button>
-            }
-            </div>
-            <pre>
-                {
-                    JSON.stringify(test, null, 2)
-                }
-            </pre>
         </div>
     )
 }
