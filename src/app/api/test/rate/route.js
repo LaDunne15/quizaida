@@ -29,66 +29,63 @@ export async function GET(req) {
 export async function PUT(req) {
 
     try{
-        
         const token = await verifyJwtToken(req.cookies.get('token')?.value);
-        if(token) {
-            const test = await Test.findById(req.nextUrl.searchParams.get("id")).populate({
-                path: 'author'
-            }).populate({
-                path: 'question'
-            });
-            const body = await req.json();
+        if(!token) throw new Error("Unauthorized");
 
-            let rating = test.rating;
-            
-            const filter =rating.filter(i=>i.user.toString() === token.id);
+        const test = await Test.findById(req.nextUrl.searchParams.get("id")).populate({
+            path: 'author'
+        }).populate({
+            path: 'question'
+        });
 
-            let liked = 0;
+        const body = await req.json();
+
+        let rating = test.rating;
             
-            if (filter.length === 0) {
-                if(body.type === "LIKE") {
-                    liked = 1;
-                    rating.push({
-                        kind: "LIKE",
-                        user: token.id
-                    });
-                } else if(body.type === "DISLIKE") {
-                    liked = -1;
-                    rating.push({
-                        kind: "DISLIKE",
-                        user: token.id
-                    });
-                }
-            } else {
-                if(filter[0].kind === body.type) {
-                    liked = 0;
-                    rating = rating.filter(i=>i.user.toString() !== token.id);
-                } else {
-                    liked = body.type === "LIKE" ? 1 : -1;
-                    filter[0].kind = body.type;
-                    rating = [...rating.filter(i=>i.user.toString() !== token.id), filter[0]];
-                }
+        const filter = rating.filter(i=>i.user.toString() === token.id);
+
+        let liked = 0;
+            
+        if (filter.length === 0) {
+            if(body.type === "LIKE") {
+                liked = 1;
+                rating.push({
+                    kind: "LIKE",
+                    user: token.id
+                });
+            } else if(body.type === "DISLIKE") {
+                liked = -1;
+                rating.push({
+                    kind: "DISLIKE",
+                    user: token.id
+                });
             }
-
-            await test.updateOne({rating}, {new: true});
-            console.log(test);
-
-            return NextResponse.json({liked, rating: test.totalrating},{
-                status: 200,
-                statusText: "OK"
-            });
-
         } else {
-            return NextResponse.json({},{
-                status: 401,
-                statusText: "Unauthorized"
-            });
-        } 
+            if(filter[0].kind === body.type) {
+                liked = 0;
+                rating = rating.filter(i=>i.user.toString() !== token.id);
+            } else {
+                liked = body.type === "LIKE" ? 1 : -1;
+                filter[0].kind = body.type;
+                rating = [...rating.filter(i=>i.user.toString() !== token.id), filter[0]];
+            }
+        }
+        await test.updateOne({rating}, {new: true});
+
+        return NextResponse.json({
+            liked,
+            rating: test.totalrating,
+            statusText: "OK"
+        },{
+            status: 200
+        });
+
+        
     } catch (err) {
-        console.log(err);
-        return NextResponse.json({},{
-            status: 400,
-            statusText: `Error ${err}`
+        return NextResponse.json({
+            statusText: err.message
+        },{
+            status: 400
         })
     }
 }

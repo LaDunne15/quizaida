@@ -40,6 +40,7 @@ export default function EditTest({params}) {
         }],
         totalrating: 0
     });
+
     const [message, setMessage] = useState("");
     const [isOwner, setIsOwner] = useState(false);
     const [inProcess, setInProcess] = useState(false);
@@ -67,58 +68,59 @@ export default function EditTest({params}) {
                 setMessage(err.message);
             }
         }
+
         fetchData();
+
     },[]);
 
     const deleteTest = async () => {
+
         const isDelete = confirm(`Do you wanna delete test "${test.theme}"?`);
-        if(isDelete) {
-            await fetch(`/api/test?id=${test._id}`, {
-                method: "DELETE"
-            }).then(res=>{
-                if(res.ok) {
-                    return res.json();
-                } else {
-                    setMessage(`${res.status} - ${res.statusText}`);
-                }
-            }).then(()=>{
-                router.push("/test");
-                //redirect("/test");
+        
+        if(!isDelete) return;
+
+        try {
+            const response = await fetch(`/api/test?id=${test.id}`, { 
+                method: "DELETE" 
             });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.statusText);            
+            router.push("/test");
+        } catch (err) {
+            setMessage(err.message);
         }
     }
 
      const startTest = async () => {
-        await fetch(`/api/response?idTest=${test._id}`, {
-            method: "POST"
-        }).then(res=>{
-            if(res.ok) {
-                return res.json();
-            } else {
-                setMessage(`${res.status} - ${res.statusText}`);
-            }
-        }).then((res)=>{
-            router.push(`/response/${res.newResponse._id}`);
-        });
+        try {
+            const response = await fetch(`/api/response?idTest=${test._id}`, { 
+                method: "POST" 
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.statusText);  
+            
+            router.push(`/response/${data.newResponse._id}`);
+
+        } catch (err) {
+            setMessage(err.message);
+        }
      }
 
     const rate = async (type) => {
-        await fetch(`/api/test/rate?id=${test._id}`, {
-            method: "PUT",
-            body: JSON.stringify({
-                type
-            })
-        }).then(res=>{
-            if(res.ok) {
-                return res.json();
-            } else {
-                setMessage(`${res.status} - ${res.statusText}`);
-            }
-        }).then(data=>{
-            //console.log(data);
+        try {
+            const response = await fetch(`/api/test/rate?id=${test._id}`, {
+                method: "PUT",
+                body: JSON.stringify({
+                    type
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.statusText);
             setLiked(data.liked);
             setTest({...test, totalrating: data.rating});
-        });
+        } catch (err) {
+            setMessage(err.message);
+        }
     }
 
     if(isLoading) {

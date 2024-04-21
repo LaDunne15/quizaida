@@ -231,43 +231,31 @@ export async function PUT(req) {
 }
 
 export async function DELETE(req) {
-
     try {
+
         const id = req.nextUrl.searchParams.get("id");
         const token = await verifyJwtToken(req.cookies.get('token')?.value);
 
-        if(token) {
+        if(!token) throw new Error("Unauthorized");
+        
+        const test = await Test.findById(id);
 
-            const test = await Test.findById(id);
+        if(test.author.toString() !== token.id) throw new Error("Forbidden");
 
-            if (test.author.toString() === token.id) {
+        await Test.findByIdAndDelete( id );
+        await Response.deleteMany({ test:id });
 
-                await Test.findByIdAndDelete( id );
-                await Response.deleteMany({ test:id });
-
-                return NextResponse.json({},{
-                    status: 200,
-                    statusText: "Deleted"
-                });
-            } else {
-                return NextResponse.json({},{
-                    status: 403,
-                    statusText: "Forbidden"
-                });
-            }
-            
-        } else {
-            
-            return NextResponse.json({},{
-                status: 401,
-                statusText: "Unauthorized"
-            });
-        }
+        return NextResponse.json({
+            statusText: "Deleted"
+        },{
+            status: 200
+        });    
 
     } catch (err) {
-        return NextResponse.json({},{
-            status: 400,
-            statusText: `Error ${err}`
+        return NextResponse.json({
+            statusText: err.message
+        },{
+            status: 400
         });
     }
 }

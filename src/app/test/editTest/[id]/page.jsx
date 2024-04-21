@@ -164,7 +164,7 @@ export default function EditTest({params}) {
     }
 
     return (
-        <form action={updateTest}>
+        <form action={updateTest} className="edit-test-block">
             <p>ID: {test._id}</p>
             <p>
                 Theme:
