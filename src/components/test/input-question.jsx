@@ -19,7 +19,6 @@ export default ({question, setQuestion}) => {
     const [focusAnswer, setFocusAnswer] = useState(null);
     const [answer, setAnswer] = useState(null);
 
-
     useEffect(()=>{
         if (!answer) return;
         if(question.answer.find(i=>i.fake_id==focusAnswer)) {

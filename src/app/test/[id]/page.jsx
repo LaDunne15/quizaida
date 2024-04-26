@@ -9,7 +9,7 @@ import noImage from "../../../static/icons/no-image.png";
 import rateActive from "../../../static/icons/rate-active.png";
 import rateInactive from "../../../static/icons/rate-inactive.png";
 
-export default function EditTest({params}) {
+export default ({params}) => {
 
     const router = useRouter();
 
@@ -63,6 +63,7 @@ export default function EditTest({params}) {
                 setInProcess(data.inProcess);
                 setResponseId(data.responseId);
                 setLiked(data.liked);
+                console.log(data);
 
             } catch (err) {
                 setMessage(err.message);
@@ -149,6 +150,7 @@ export default function EditTest({params}) {
                     <h1 className="title">{test.theme}</h1>
                     <div className="visibility-time">
                          <label>{ test.type }</label>
+                         <label>{ test.question.length } questions</label>
                          <label>{ validationService.determineTimePassed(test.created) }</label>
                     </div>
                     <div className="rating">

@@ -10,7 +10,7 @@ export default ({images, setImages}) => {
                         style={{
                             objectFit: "cover"
                         }}
-                        src={URL.createObjectURL(i)}
+                        src={ typeof i === "string" ? i : URL.createObjectURL(i)}
                         alt="Downloaded"
                         width={100}
                         height={100}

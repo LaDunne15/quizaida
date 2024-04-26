@@ -1,32 +1,38 @@
 "use client";
-import Image from "next/image";
-import Link from "next/link";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { v4 as uuidv4 } from 'uuid';
 import { useEffect, useState } from "react";
+import ImageInput from "../../../../components/image";
+import Question from "../../../../components/test/question";
+import InputQuestion from "../../../../components/test/input-question";
+import { validationService } from "../../../../libs/validationService";
 
-export default function EditTest({params}) {
+export default ({params}) => {
 
-    const [isLoading, setIsLoading] = useState(true);
+    const getId = () => uuidv4();
+    const first_id = "92b59cd8-d2f4-49ec-8dbc-f2ee41bf74b8";
 
     const clearQuestion = {
-        _id: "",
+        _id: null,
         text: "",
         photo: [],
         answer: [],
         comment: "",
-        sourse: ""
+        sourse: "",
+        fake_id:first_id
     }
+    const [focusQuestion, setFocusQuestion] = useState(null);
 
+    const [isLoading, setIsLoading] = useState(true);
     const [test, setTest] = useState({
-        _id:"",
+        _id: null,
         author: {
             id: "",
             firstname: "",
             lastname: ""
         },
         theme: "",
-        mainImage: "",
+        mainImage: "" || null,
         type: "",
         description: "",
         sourse: [],
@@ -36,107 +42,103 @@ export default function EditTest({params}) {
     const [message, setMessage] = useState("");
     const [sourse, setSourse] = useState("");
 
-    
-    const [images, setImages] = useState([]);
-
     const [question, setQuestion] = useState(clearQuestion)
     const [questions, setQuestions] = useState([clearQuestion]);
 
-    const [photo, setPhoto] = useState("");
-    const [answer, setAnswer] = useState({
-        correct: false,
-        text: "",
-        photo: ""
-    });
-
-    function objectsAreEqual(obj1, obj2) {
-        // Перевіряємо, чи обидва аргументи є об'єктами
-        if (typeof obj1 !== 'object' || typeof obj2 !== 'object') {
-            return false;
-        }
-    
-        // Перевіряємо кількість властивостей
-        if (Object.keys(obj1).length !== Object.keys(obj2).length) {
-            return false;
-        }
-    
-        for (let key in obj1) {
-            // Рекурсивно перевіряємо кожне поле
-            if (!objectsAreEqual(obj1[key], obj2[key])) {
-                return false;
-            }
-        }
-    
-        return true;
-    }
+    const router = useRouter();
 
     const addQuestion = () => {
-        if (!objectsAreEqual(question, clearQuestion)) {
+        if (!validationService.objectsAreEqual(question, clearQuestion)) {
             setQuestions([...questions, question]);
             setQuestion(clearQuestion);
         }
     }
 
     useEffect(()=>{
-        fetch(`/api/test?id=${params.id}`,{
-            method: "GET"
-        }).then(res=>{
-            if(res.ok) {
-                return res.json();
-            } else {
-                setMessage(`${res.status} - ${res.statusText}`);
+
+        const fetchData = async () => {
+            try { 
+                const response = await fetch(`/api/test?id=${params.id}`,{ method: "GET" });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.statusText);
+                setQuestions(data.test.question.map(q=>{
+                    return {
+                        ...q, 
+                        fake_id: getId(),
+                        answer: q.answer.map(a=>{
+                            return {
+                                ...a, 
+                                fake_id: getId()
+                            }
+                        })
+                    }
+                }));
+                
+                setIsLoading(false);
+                setTest(data.test);
+            } catch (err) {
+                setMessage(err.message);
             }
-        }).then(data=>{
-            setIsLoading(false);
-            setTest(data.test);
-            //setImages(data.test);
-            setQuestions(data.test.question);
-        })
+        }
+
+        fetchData();
     },[]);
 
     const updateTest = async () => {
 
-        let formData = new FormData();
+        try {
+            let formData = new FormData();
 
-        const _questions = questions.filter(q=>!q._id).map((i)=>{
-            const photo = i.photo.map(j=>{
-                const idPhoto = uuidv4();
-                formData.append(`${idPhoto}`,j);
-                return idPhoto;
+            const _questions = questions.map((i)=>{
+                const photo = i.photo.map(j=>{
+                    if(typeof j === "string") return j;
+                    const idPhoto = uuidv4();
+                    formData.append(`${idPhoto}`,j);
+                    return idPhoto;
+                });
+                const answer = i.answer.map(j=>{
+                    if(typeof j.photo === "string") return j;
+                    const idPhoto = uuidv4();
+                    formData.append(`${idPhoto}`,j.photo);
+                    return {...j, photo: idPhoto}
+                });
+                return {...i, photo, answer };
             });
-            const answer = i.answer.map(j=>{
-                const idPhoto = uuidv4();
-                formData.append(`${idPhoto}`,j.photo);
-                return {...j, photo: idPhoto}
+    
+            let newImageFilename = null;
+    
+            if (test.mainImage) {
+                if (typeof test.mainImage === "string") {
+                    newImageFilename = test.mainImage;
+                } else {
+                    const idPhoto = uuidv4();
+                    formData.append(`${idPhoto}`,test.mainImage);
+                    newImageFilename = idPhoto;
+                }
+            }
+    
+            formData.append('test', JSON.stringify({
+                ...test,
+                mainImage: newImageFilename,
+                question: [..._questions]
+            }));
+
+            const response = await fetch(`/api/test?id=${params.id}`,{
+                method: "PUT",
+                body: formData
             });
-            return {...i, photo, answer };
-        });
 
-        let newImageFilename = "";
+            const data = await response.json();
 
-        if(typeof test.mainImage!="string") {
-            const idPhoto = uuidv4();
-            formData.append(`${idPhoto}`,test.mainImage);
-            newImageFilename = idPhoto;
+            if (!response.ok) throw new Error(data.statusText);
+
+            router.push(`/test/${test._id}`);
+
+        } catch (err) {
+            setMessage(err.message);
         }
 
-        formData.append('test', JSON.stringify({
-            ...test,
-            mainImage: typeof test.mainImage==="string"?test.mainImage:newImageFilename,
-            question: [ ...test.question , ..._questions]
-        }));
-
-        
-        await fetch(`/api/test?id=${params.id}`,{
-            method: "PUT",
-            body: formData
-        }).then(res=>{
-            if(res.ok) {
-                redirect(`/test/${test._id}`);
-            } else {
-                setMessage(`${res.status} - ${res.statusText}`);
-            }
-        });
+       
     }
 
     const addSourse = () => {
@@ -147,13 +149,16 @@ export default function EditTest({params}) {
         }
     }
 
-    const removeSourse = (_sourse) => {
-        setTest({...test,sourse:[...test.sourse.filter(el=>el!=_sourse)]});
-    }
-
     useEffect(()=>{
-        setQuestion({...question,photo:[...images]});
-    },[images]);
+        if (!question) return;
+        if (questions.find(i=>i.fake_id==focusQuestion)) {
+            setQuestions(questions.map(i=>i.fake_id==focusQuestion?question:i));
+        } else {
+            setQuestions([...questions,question]);
+        }
+        setFocusQuestion(question.fake_id);
+
+    }, [question]);
 
     if(isLoading) {
         return (
@@ -165,62 +170,88 @@ export default function EditTest({params}) {
 
     return (
         <form action={updateTest} className="edit-test-block">
-            <p>ID: {test._id}</p>
-            <p>
-                Theme:
-                <input type="text" name="" id="" value={test.theme} onChange={(e)=>{setTest({...test,theme:e.target.value})}}/>
-            </p>
-            <div>
-                <label>Main image</label>
-                <input type="file" name="" id="" onChange={(e)=> {if (e.target.files.length) setTest({...test,mainImage: e.target.files[0]})}}/>
-                { 
-                
-                    test.mainImage && <Image
-                    priority
-                    style={{
-                        objectFit: "cover"
-                    }}
-                    src={typeof test.mainImage==="string"?test.mainImage:URL.createObjectURL(test.mainImage)}
-                    alt="Downloaded"
-                    width={100}
-                    height={100}
-                    />
-                }
-                <button type="button" onClick={()=>setTest({...test, mainImage:""})}>Remove</button>
+            <h1 className="title">Editing Test</h1>
+            <h2 className="sub-title">ID: {test._id}</h2>
+            <div className="main-info">
+                <ImageInput image={test.mainImage} setImage={(file) => setTest({...test,mainImage: file})}/>
+                <div className="input-data">
+                    <p>
+                        <label htmlFor="theme">Theme:</label>
+                        <input type="text" name="theme" id="" value={test.theme} onChange={(e)=> { setTest({...test,theme:e.target.value}) }}/>
+                    </p>
+                    <p>
+                        <label htmlFor="date">Author:</label>
+                        <span>{test.author.firstname} {test.author.lastname}</span>
+                    </p>
+                    <p>
+                        <label htmlFor="date">Created:</label>
+                        <span>{ validationService.determineTimePassed(test.created) }</span>
+                    </p>
+                    <p>
+                        <label htmlFor="description">Description:</label>
+                        <textarea name="" id="" cols="30" rows="10" value={test.description} onChange={(e)=>{ setTest({...test,description:e.target.value}) }}/>
+                    </p>
+                </div>
             </div>
-            <p>
-                Description:
-                <textarea name="" id="" cols="30" value={test.description} rows="10" onChange={(e)=>{setTest({...test,description:e.target.value})}}></textarea>
-            </p>
-            <p>
-                Author:
-                {test.author.firstname} {test.author.lastname}
-            </p>
-            <div>
+            <ul className="type">
+                <li className={test.type=="PUBLIC"?"checked":""}>
+                    <input type="radio" name="type" value="PUBLIC" checked={test.type=="PUBLIC"} id="" onChange={()=>setTest({...test, type:"PUBLIC"})}/>
+                    <span>Public</span>
+                </li>
+                <li className={test.type=="PRIVATE"?"checked":""}>
+                    <input type="radio" name="type" value="PRIVATE" checked={test.type=="PRIVATE"} id="" onChange={()=>setTest({...test, type:"PRIVATE"})}/>
+                    <span>Private</span>
+                </li>
+            </ul>
+            
+            <div className="sources">
+                <h2 className="sub-title">Sourses</h2>
+                <div>
+                    <input type="text" name="" id="" placeholder="Input link" value={sourse} onChange={(e)=>setSourse(e.target.value)}/>
+                    <input type="button" value="Add"  onClick={addSourse} disabled={sourse==""}/>
+                </div>
                 <ul>
-                    <li>
-                        <input type="radio" name="type" id="" checked={test.type==="PUBLIC"} onChange={()=>setTest({...test,type:"PUBLIC"})}/>
-                        <span>Public</span>
-                    </li>
-                    <li>
-                        <input type="radio" name="type" id="" checked={test.type==="PRIVATE"} onChange={()=>setTest({...test,type:"PRIVATE"})}/>
-                        <span>Private</span>
-                    </li>
-                </ul>
-            </div>
-            <div>
-                <p>Sourses</p>
-                <input type="text" name="" id="" value={sourse} onChange={(e)=>setSourse(e.target.value)}/>
-                <input type="button" value="Add"  onClick={addSourse}/>
                 {
                     test.sourse.map((s,index)=>
-                        <p key={index}>
-                            <span>{s}</span>
-                            <input type="button" value="X" onClick={() =>removeSourse(s)}/>
-                        </p>
+                        <li key={index}>
+                            <label>{s}</label>
+                            <input type="button" value="X" className="close-btn" onClick={() =>setTest({...test, sourse:[...test.sourse.filter(el=>el!=s)]})}/>
+                        </li>
                     )
                 }
+                {
+                    test.sourse.length == 0 && <li>No sourses</li>
+                }
+                </ul>
             </div>
+            <div className="questions">
+                <h2 className="sub-title">Questions</h2>
+                <ul className="questions-list">
+                    {
+                        questions.map((q,index)=>{
+                            if(q.fake_id == focusQuestion) {
+                                return <InputQuestion key={index} question={question} setQuestion={setQuestion} addQuestion={addQuestion}/>
+                            } else {
+                                return <Question key={index} question={q} 
+                                    setQuestions={()=>{
+                                        setQuestions([...questions.filter(el=>el!=q)]);
+                                    }}
+                                    onClick={()=>{
+                                        setFocusQuestion(q.fake_id);
+                                        setQuestion({...q, _id:null});
+                                    }}
+                                />
+                            }
+                        })
+                    }
+                </ul>
+                <input type="button" value="Add Question" onClick={()=>{
+                    const id = getId();
+                    setFocusQuestion(id);
+                    setQuestion({...clearQuestion, fake_id:id});
+                }}/>
+            </div>
+            {/*
             <div>
                 <label>Questions</label>
                 <div>
@@ -241,7 +272,7 @@ export default function EditTest({params}) {
                                     style={{
                                         objectFit: "cover"
                                     }}
-                                    src={URL.createObjectURL(i)}
+                                    src={ typeof i === "string" ? i : URL.createObjectURL(i)}
                                     alt="Downloaded"
                                     width={100}
                                     height={100}
@@ -290,7 +321,7 @@ export default function EditTest({params}) {
                                         style={{
                                             objectFit: "cover"
                                         }}
-                                        src={URL.createObjectURL(a.photo)}
+                                        src={  typeof a.photo === "string" ? a.photo : URL.createObjectURL(a.photo)}
                                         alt="Downloaded"
                                         width={100}
                                         height={100}
@@ -360,18 +391,13 @@ export default function EditTest({params}) {
                     }
             </ul>
             </div>
-            <p>
-                Created: {test.created}
-            </p>
-            <pre>
-                {
-                    JSON.stringify(test, null, 2)
-                }
-            </pre>
-            {
-                message
-            }
+                */}
+            <p>{ message }</p>
             <input type="submit" value="Save Changes"/>
+            <pre>
+                { JSON.stringify(question, null, 2) }
+                { JSON.stringify(test, null, 2) }
+            </pre>
         </form>
     )
 }

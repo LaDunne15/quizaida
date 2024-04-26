@@ -10,7 +10,7 @@ export default ({answer, deleteAnswer, onClick}) => {
                         style={{
                             objectFit: "cover"
                         }}
-                        src={URL.createObjectURL(answer.photo)}
+                        src={ typeof answer.photo === "string" ? answer.photo : URL.createObjectURL(answer.photo)}
                         alt="Downloaded"
                         width={100}
                         height={100}/>

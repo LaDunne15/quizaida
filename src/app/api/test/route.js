@@ -147,85 +147,91 @@ export async function PUT(req) {
         
         const token = await verifyJwtToken(req.cookies.get('token')?.value);
 
-        if(token) {
+        if(!token) throw new Error("Unauthorized");
 
-            const id = req.nextUrl.searchParams.get("id");
-            const test = await Test.findById(id);
+        const id = req.nextUrl.searchParams.get("id");
+        const _test = await Test.findById(id);
 
-            if (test.author.toString() === token.id) {
+        if (_test.author.toString() !== token.id) throw new Error("Forbidden");
 
-                const formData = await req.formData();
-                const test = JSON.parse(formData.get('test'));
+        const formData = await req.formData();
+        const test = JSON.parse(formData.get('test'));
 
-                
-                const newQuestions = test.question.filter(q=>q._id==="")
-                    .map((doc)=>{ 
-                        const { _id, ...obj } = doc; 
-                        const photo = obj.photo.map((p)=>{
-                            const _file = formData.get(p);
-                            if (!_file) return "";
-            
-                            const filename = `${p}.${_file.name.split('.').pop()}` 
-                            awsService.uploadFile(_file, filename);
-                            return awsService.getFileLink(filename);
-                        });
-            
-                        const answer = obj.answer.map(j=>{
-                            const _file = formData.get(j.photo);
-                            if (!_file) return {...j, photo: ""};
-                            const filename = `${j.photo}.${_file.name.split('.').pop()}`
-                            awsService.uploadFile(_file, filename);
-                            return {...j, photo: awsService.getFileLink(filename)}
-                        });
-            
-                        return {...obj, photo, answer };
-                    });
-                    
-                const createdQuestions = await Question.insertMany(newQuestions);
+        const questions = await Promise.all(test.question.map( async (q)=>{
 
-                const oldQuestionsIds = test.question.filter(q=>q._id!="").map(doc => doc._id);
-                const newQuestionsIds = createdQuestions.map(doc => doc._id);
+            if (q._id) {
 
-
-
-                if(!test.mainImage.includes(".") && test.mainImage!=="") {
-                    const _file = formData.get(test.mainImage);
-                    const filename = `${test.mainImage}.${_file.name.split('.').pop()}`;
-                    test.mainImage = awsService.getFileLink(filename);
-                    awsService.uploadFile(_file, filename);
-                }
-                
-                await Test.findByIdAndUpdate(id, {
-                    type: test.type,
-                    theme: test.theme,
-                    sourse: test.sourse,
-                    mainImage: test.mainImage,
-                    description: test.description,
-                    question: [...oldQuestionsIds,...newQuestionsIds]
-                });
-
-                return NextResponse.json({},{
-                    status: 200,
-                    statusText: "Updated"
-                }); 
+                return q;
 
             } else {
-                return NextResponse.json({},{
-                    status: 403,
-                    statusText: "Forbidden"
+
+                const { _id, ...obj } = q; 
+
+                const photo = obj.photo.map((p)=>{
+                    if(p.startsWith("https")) return p;
+                    const _file = formData.get(p);
+                    if (!_file) return "";
+                    const filename = `${p}.${_file.name.split('.').pop()}` 
+                    awsService.uploadFile(_file, filename);
+                    return awsService.getFileLink(filename);
                 });
+            
+                const answer = obj.answer.map(j=>{
+                    if(j.photo.startsWith("https")) return j;
+                    const _file = formData.get(j.photo);
+                    if (!_file) return {...j, photo: ""};
+                    const filename = `${j.photo}.${_file.name.split('.').pop()}`
+                    awsService.uploadFile(_file, filename);
+                    return {...j, photo: awsService.getFileLink(filename)}
+                });
+
+                const newQuestion = new Question({
+                    ...obj,
+                    photo,
+                    answer
+                });
+                
+                const result = await newQuestion.save();
+            
+                return {
+                    ...obj,
+                    photo,
+                    answer,
+                    _id: result._id.toString()
+                }
             }
-        } else {
-            return NextResponse.json({},{
-                status: 401,
-                statusText: "Unauthorized"
-            });
-        }
+        }));
+
+       if (test.mainImage) {
+            if(!test.mainImage.startsWith("https")) {
+                const _file = formData.get(test.mainImage);
+                const filename = `${test.mainImage}.${_file.name.split('.').pop()}`;
+                test.mainImage = awsService.getFileLink(filename);
+                awsService.uploadFile(_file, filename);
+            }
+       }
+        
+                
+        await Test.findByIdAndUpdate(id, {
+            type: test.type,
+            theme: test.theme,
+            sourse: test.sourse,
+            mainImage: test.mainImage,
+            description: test.description,
+            question: questions
+        });
+
+        return NextResponse.json({},{
+            status: 200,
+            statusText: "Updated"
+        }); 
 
     } catch (err) {
-        return NextResponse.json({},{
-            status: 400,
-            statusText: `Error ${err}`
+
+        return NextResponse.json({
+            statusText: err.message
+        },{
+            status: 400
         });
     }
 }

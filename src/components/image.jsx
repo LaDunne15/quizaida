@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { memo } from "react";
 
-export default memo(({image, setImage}) => {
+export default ({image, setImage}) => {
     
     if (!image) return (
         <div className="add-image">
@@ -13,7 +13,7 @@ export default memo(({image, setImage}) => {
         <div className="image">
             <Image
                 style={{objectFit: "cover"}}
-                src={ URL.createObjectURL(image) }
+                src={ typeof image === "string" ? image : URL.createObjectURL(image) }
                 alt="Main image"
                 width={100}
                 height={100}/>
@@ -21,4 +21,4 @@ export default memo(({image, setImage}) => {
         </div>
     );
 
-});
+};

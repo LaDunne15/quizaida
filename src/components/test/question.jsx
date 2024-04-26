@@ -14,10 +14,10 @@ export default ({question, setQuestions, onClick}) => {
                 {   
                     question.photo.map((i,index2)=><Image
                         key={index2}
-                        src={URL.createObjectURL(i)}
+                        src={  typeof i === "string" ? i : URL.createObjectURL(i)}
                         alt="Downloaded"
-                        width={100}
-                        height={100}
+                        width={200}
+                        height={200}
                     />)
                 }
                 </div>
@@ -31,10 +31,10 @@ export default ({question, setQuestions, onClick}) => {
                                     style={{
                                         objectFit: "cover"
                                     }}
-                                    src={URL.createObjectURL(a.photo)}
+                                    src={  typeof a.photo === "string" ? a.photo : URL.createObjectURL(a.photo) }
                                     alt="Downloaded"
-                                    width={100}
-                                    height={100}
+                                    width={200}
+                                    height={200}
                                 />
                             }
                     </li>)

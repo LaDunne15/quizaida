@@ -2,20 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../hooks/useAuth";
-import { redirect } from "next/navigation";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { v4 as uuidv4 } from 'uuid';
 import ImageInput from "../../../components/image";
 import { validationService } from "../../../libs/validationService.js";
-import ImagesInput from "../../../components/images";
-import Answer from "../../../components/test/answer";
-import InputAnswer from "../../../components/test/input-answer";
 import Question from "../../../components/test/question";
 import InputQuestion from "../../../components/test/input-question";
 
-export default function CreateTest() {
+export default () => {
     
     const getId = () => uuidv4();
     const first_id = "92b59cd8-d2f4-49ec-8dbc-f2ee41bf74b8";
@@ -40,8 +34,8 @@ export default function CreateTest() {
     }
 
     const [focusQuestion, setFocusQuestion] = useState(null);
+    
     const [question, setQuestion] = useState(null);
-
     const [questions, setQuestions] = useState([]);
 
     const router = useRouter();
@@ -97,7 +91,6 @@ export default function CreateTest() {
 
 
         } catch (err) {
-            console.log(err);
             setMessage(err.message);
         }
     }
