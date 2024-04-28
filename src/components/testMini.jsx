@@ -1,7 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 
+
 export default function TestMini({data}) {
+
+    console.log(data);
 
     return (
         <div>

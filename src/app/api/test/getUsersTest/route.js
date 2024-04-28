@@ -8,20 +8,27 @@ connect();
 
 export async function GET(req) {
 
-    const token = await verifyJwtToken(req.cookies.get('token')?.value);
+    try {
 
-    if(token) {
+        const token = await verifyJwtToken(req.cookies.get('token')?.value);
+
+        if (!token) throw new Error("Unauthorized");
+
         const tests = await Test.find({
             author: token.id
-        });
-        return NextResponse.json({tests},{
+        }).sort({ created: -1 });
+
+        return NextResponse.json({ tests },{
             status: 200,
             statusText: "OK"
         })
-    } else {
-        return NextResponse.json({},{
-            status: 401,
-            statusText: "Unauthorized"
-        })
+
+    } catch (err) {
+
+        return NextResponse.json({
+            statusText: err.message
+        }, {
+            status: 400
+        });
     }
 }
