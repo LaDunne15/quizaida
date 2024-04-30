@@ -23,7 +23,7 @@ export default ({tests}) => {
                         <div className="data">
                             <span className="theme">{i.theme}</span>
                             <ul>
-                                <li>{i.question.length} Q</li>
+                                <li>{i.question.length} questions</li>
                                 <li>
                                     <span>{i.totalrating}</span>
                                     <Image src={rateActive} style={{
@@ -31,7 +31,7 @@ export default ({tests}) => {
                                     }} alt="Downloaded" width={20} height={20}/>
                                 </li>
                             </ul>
-                            <span className="date">{validationService.determineTimePassed(i.created)}</span>
+                            <span className="date">Created {validationService.determineTimePassed(i.created)}</span>
                             <Link href={`/test/${i._id}`}># Details</Link>
                         </div>
                     </li>

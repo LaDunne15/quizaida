@@ -73,7 +73,7 @@ export async function GET(req) {
             }).populate({
                 path: 'executor'
             }).sort({
-                started: 1
+                started: -1
             });
                 
             return NextResponse.json({

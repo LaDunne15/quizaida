@@ -13,19 +13,23 @@ export default function Tests() {
     const createTest = () => router.push("test/createTest");
 
     useEffect(() => {
-        setIsLoading(true);
-        fetch('/api/test/getUsersTest',{
-            method: "GET"
-        }).then(i=>{
-            if(i.ok) {
-                return i.json();
-            } else {
-                setMessage(`${i.status} - ${i.statusText}`);
+
+        const fetchData = async () => {
+            try {
+                setIsLoading(true);
+                const response = await fetch('/api/test/getUsersTest', {
+                    method: "GET"
+                });
+                const data = await response.json();
+                if(!response.ok) throw new Error(data.statusText);
+                setIsLoading(false);
+                setTests(data.tests);
+            } catch (err) {
+                setMessage(err.message);
             }
-        }).then(result=>{
-            setIsLoading(false);
-            setTests(result.tests);
-        });
+        }
+
+        fetchData();
     },[]);
 
     if(isLoading) {

@@ -394,10 +394,6 @@ export default ({params}) => {
                 */}
             <p>{ message }</p>
             <input type="submit" value="Save Changes"/>
-            <pre>
-                { JSON.stringify(question, null, 2) }
-                { JSON.stringify(test, null, 2) }
-            </pre>
         </form>
     )
 }

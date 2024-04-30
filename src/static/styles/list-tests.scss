@@ -1,6 +1,6 @@
 @use 'variables';
 
-.my-tests {
+.my-tests, .my-responses {
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -11,7 +11,7 @@
         
     }
 
-    .test-list {
+    .test-list, .response-list {
         display: inline-flex;
         flex-wrap: wrap;
         flex-direction: row;
@@ -28,9 +28,6 @@
             border: 2px dashed variables.$greenDarker;
             padding: 5px;
 
-            &:hover {
-                @include variables.background-net;
-            }
 
             img {
                 aspect-ratio: 1/1;
@@ -43,6 +40,7 @@
                 width: 100%;
                 min-width: 200px;
                 justify-content: space-between;
+                padding: 7px;
 
                 .theme {
                     font-weight: bold;
@@ -68,11 +66,35 @@
                     font-size: x-small;
                     font-style: italic;
                     text-align: end;
+                    padding: 3px;
+                    transition: 0.5s;
+
+                    &:nth-of-type(3) {
+                        background-color: variables.$greenDarker;
+                        color: variables.$greenLight;
+                        font-size: small;
+
+                    }
                 }
 
                 a {
                     text-align: end;
                     color: variables.$greenDarker;
+                    transition: 0.5s;
+
+                }
+            }
+            
+            &:hover {
+                @include variables.background-net;
+
+                .date:nth-of-type(3) {  
+                    padding-right: 30px;
+                }
+
+                
+                a:hover {
+                    padding-right: 30px;
                 }
             }
         }
