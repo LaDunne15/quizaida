@@ -23,8 +23,12 @@ class ValidationService {
     }
 
     determineTimePassed = (timeString) => {
+        return `${this.determineTimeBetween(timeString, new Date())} ago`;
+    }
+
+    determineTimeBetween = (timeString, timeString2) => {
         const sentTime = new Date(timeString);
-        const currentTime = new Date();
+        const currentTime = new Date(timeString2);
     
         const timeDifference = currentTime - sentTime;
         const minutes = Math.floor(timeDifference / (1000 * 60));
@@ -34,15 +38,15 @@ class ValidationService {
         const years = Math.floor(months / 12);
     
         if (years > 0) {
-            return `${years} year${years > 1 ? 's' : ''} ago`;
+            return `${years} year${years > 1 ? 's' : ''}`;
         } else if (months > 0) {
-            return `${months} month${months > 1 ? 's' : ''} ago`;
+            return `${months} month${months > 1 ? 's' : ''}`;
         } else if (days > 0) {
-            return `${days} day${days > 1 ? 's' : ''} ago`;
+            return `${days} day${days > 1 ? 's' : ''}`;
         } else if (hours > 0) {
-            return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            return `${hours} hour${hours > 1 ? 's' : ''}`;
         } else {
-            return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            return `${minutes} minute${minutes > 1 ? 's' : ''}`;
         }
     }
     
