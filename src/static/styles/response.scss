@@ -6,20 +6,6 @@
     gap: 5px;
     padding-top: 10px;
 
-    .link {
-        color: variables.$greenDarker;
-        transition: 0.25s;
-        padding-left: 30px;
-
-        &::before {
-            content: "# ";
-            text-decoration: none;
-        }
-
-        &:hover {
-            padding-left: 50px;
-        }
-    }
 
     .in-process, .completed {
 

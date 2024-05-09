@@ -228,12 +228,26 @@ export default ({params}) => {
                 <h2 className="sub-title">Questions</h2>
                 <ul className="questions-list">
                     {
-                        questions.map((q,index)=>{
-                            if(q.fake_id == focusQuestion) {
-                                return <InputQuestion key={index} question={question} setQuestion={setQuestion} addQuestion={addQuestion}/>
-                            } else {
-                                return <Question key={index} question={q} 
-                                    setQuestions={()=>{
+                        questions.map((q,index)=>
+                            <div key={index}>
+                                <ol className="warnings">
+                                    {
+                                        !q.text && <li>Question text is empty</li>
+                                    }
+                                    {
+                                        q.answer.length<2 && <li>Question must have at least 2 answers</li>
+                                    }
+                                    {
+                                        q.answer.filter(i=>i.correct).length<1 && <li>Must have at least 1 correct answer</li>
+                                    }
+                                </ol>
+                                {
+                                    q.fake_id == focusQuestion && <InputQuestion question={question} setQuestion={setQuestion} addQuestion={addQuestion}/>
+                                }
+                                {
+                                    q.fake_id != focusQuestion && <Question question={q}
+                                    setQuestions={(e)=>{
+                                        e.stopPropagation(); 
                                         setQuestions([...questions.filter(el=>el!=q)]);
                                     }}
                                     onClick={()=>{
@@ -241,8 +255,9 @@ export default ({params}) => {
                                         setQuestion({...q, _id:null});
                                     }}
                                 />
-                            }
-                        })
+                                }
+                            </div>
+                        )
                     }
                 </ul>
                 <input type="button" value="Add Question" onClick={()=>{
@@ -251,147 +266,6 @@ export default ({params}) => {
                     setQuestion({...clearQuestion, fake_id:id});
                 }}/>
             </div>
-            {/*
-            <div>
-                <label>Questions</label>
-                <div>
-                    <label>Add Question</label>
-                    <div>
-                        <label>Text:</label>
-                        <input type="text" name="" id="" onChange={(e)=>setQuestion({...question,text:e.target.value})}/>
-                    </div>
-                    <div>
-                        <label>Photos:</label>
-                        <input type="file" name="" id="" onChange={(e) => {
-                            if (e.target.files.length) setImages([...images,e.target.files[0]])
-                        }}/>
-                        <div>
-                            {    
-                                question.photo.map((i,index)=><div key={index}>
-                                    <Image
-                                    style={{
-                                        objectFit: "cover"
-                                    }}
-                                    src={ typeof i === "string" ? i : URL.createObjectURL(i)}
-                                    alt="Downloaded"
-                                    width={100}
-                                    height={100}
-                                    />
-                                    <input type="button" value="X" onClick={() =>{setImages([...question.photo.filter(el=>el!=i)])}}/>
-                                </div>)
-                            }
-                        </div>
-                    </div>
-                    <div>
-                        <label>Answers:</label>
-                        <div>
-                            <p>Text:</p>
-                            <input type="text" name="" id="" onChange={(e)=>setAnswer({...answer,text:e.target.value})}/>
-                        </div>
-                        <div>
-                            <p>Photo:</p>
-                            <input type="file" name="" id="" onChange={(e) => {
-                                if(e.target.files.length) setAnswer({...answer, photo:e.target.files[0]});
-                            }
-                            }/>
-                            {
-                                answer.photo && <Image
-                                    style={{
-                                        objectFit: "cover"
-                                    }}
-                                    src={URL.createObjectURL(answer.photo)}
-                                    alt="Downloaded"
-                                    width={100}
-                                    height={100}
-                                />
-                            }
-                        </div>
-                        <div>
-                            Correct:
-                            <input type="checkbox" name="" id="" onChange={(e)=>setAnswer({...answer,correct:e.target.checked})}/>
-                        </div>
-                        <input type="button" value="Add Answer" onClick={(e)=>setQuestion({...question,answer:[...question.answer,answer]})}/>                        
-                        <div>
-                        {
-                                question.answer.map((a, index) => <li key={index}>
-                                    <h5>{a.text}</h5>
-                                    <input type="checkbox" name="" id="" checked={a.correct} disabled={true}/>
-                                    {
-                                        a.photo && <Image
-                                        style={{
-                                            objectFit: "cover"
-                                        }}
-                                        src={  typeof a.photo === "string" ? a.photo : URL.createObjectURL(a.photo)}
-                                        alt="Downloaded"
-                                        width={100}
-                                        height={100}
-                                    />
-                                    }
-                                    <input type="button" value="X" 
-                                        onClick={() =>{
-                                            setQuestion({...question,answer:[...question.answer.filter(el=>el!==a)]})
-                                        }} 
-                                    />
-                                </li>)
-                            }
-                        </div>
-                    </div>
-                    <div>
-                        <label>Comment:</label>
-                        <input type="text" name="" id="" onChange={(e)=>setQuestion({...question,comment:e.target.value})}/>
-                    </div>
-                    <div>
-                        <label>Source:</label>
-                        <input type="text" name="" id="" onChange={(e)=>setQuestion({...question,sourse:e.target.value})}/>
-                    </div>
-                    <input type="button" value="Add Question" onClick={addQuestion}/>
-                </div>
-                <ul>
-                {
-                        questions.map((s,index)=>
-                            <li key={index}>
-                                <h5>{s.text}</h5>
-                                <h5>{s._id?s._id:"NEW"}</h5>
-                                {
-                                    s.photo.map((i,index2)=><Image
-                                    key={index2}
-                                    style={{
-                                        objectFit: "cover"
-                                    }}
-                                    src={s._id?i:URL.createObjectURL(i)}
-                                    alt="Downloaded"
-                                    width={100}
-                                    height={100}
-                                    />)
-                                }
-                                <ul>
-                                    {
-                                        s.answer.map((a,index3)=><li key={index3}>
-                                            <h5>{a.text}</h5>
-                                            <input type="checkbox" name="" id="" checked={a.correct} disabled={true}/>
-                                            {
-                                                
-                                                a.photo && <Image
-                                                style={{
-                                                objectFit: "cover"
-                                                }}
-                                                src={s._id?a.photo:URL.createObjectURL(a.photo)}
-                                                alt="Downloaded"
-                                                width={100}
-                                                height={100}
-                                                />
-                                            }
-                                        </li>)
-                                    }
-                                </ul>
-                                <p><i>{s.comment}</i></p>
-                                <Link href={s.sourse}>{s.sourse}</Link>
-                                <input type="button" value="X" onClick={() =>{setQuestions([...questions.filter(el=>el!=s)])}}/>
-                            </li>)
-                    }
-            </ul>
-            </div>
-                */}
             <p>{ message }</p>
             <input type="submit" value="Save Changes"/>
         </form>

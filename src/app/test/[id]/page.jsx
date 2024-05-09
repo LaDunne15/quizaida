@@ -134,6 +134,7 @@ export default ({params}) => {
 
     return (
         <div className="test-preview">
+            <Link href="/" className="link">Back to all tests</Link>
             <div className="test-header">
                 <div className="image">
                     <Image
@@ -173,7 +174,7 @@ export default ({params}) => {
                     <h2 className="sub-title">Sources</h2>
                     <ul>
                         {
-                            test.sourse.map(s=><li key={s}><Link href={s} target="_blank" rel="noopener noreferrer">{s}</Link></li>)
+                            test.sourse.map(s=><li key={s}><Link href={s} className="link" target="_blank" rel="noopener noreferrer">{s}</Link></li>)
                         }
                     </ul>
                 </div>

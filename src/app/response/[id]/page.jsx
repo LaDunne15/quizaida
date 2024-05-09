@@ -346,11 +346,6 @@ export default function Response ({params}) {
                     <input type="submit" value="Complete"/>
                 </form>
             }
-            <pre>
-                {
-                    //JSON.stringify(response, null, 2)
-                }
-            </pre>
         </div>
     )
 }

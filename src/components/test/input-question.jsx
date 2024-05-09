@@ -44,11 +44,11 @@ export default ({question, setQuestion}) => {
                 <div className="input-data">
                     <p>
                         <label>Comment:</label>
-                        <input type="text" name="" id="" onChange={(e)=>setQuestion({...question,comment:e.target.value})}/>
+                        <input type="text" name="" id="" defaultValue={question.comment} onChange={(e)=>setQuestion({...question,comment:e.target.value})}/>
                     </p>
                     <p>
                         <label>Source:</label>
-                        <input type="text" name="" id="" onChange={(e)=>setQuestion({...question,sourse:e.target.value})}/>
+                        <input type="text" name="" id="" defaultValue={question.sourse} onChange={(e)=>setQuestion({...question,sourse:e.target.value})}/>
                     </p>
                 </div>
             </div>
@@ -57,11 +57,18 @@ export default ({question, setQuestion}) => {
                     <label className="sub-sub-title">Answers:</label>
                     <ul>
                         {
-                            question.answer.map((a, index) => {
-                                if (a.fake_id == focusAnswer) {
-                                    return <InputAnswer key={index} answer={a} setAnswer={setAnswer}/>
-                                } else {
-                                    return <Answer key={index} answer={a} 
+                            question.answer.map((a, index) => 
+                                <div key={index}>
+                                    <ol className="warnings">
+                                        {
+                                            (!a.text && !a.photo) && <li>No photo or image</li>
+                                        }
+                                    </ol>
+                                    {
+                                        a.fake_id == focusAnswer && <InputAnswer answer={answer} setAnswer={setAnswer}/>
+                                    }
+                                    {
+                                        a.fake_id != focusAnswer && <Answer answer={a}
                                         deleteAnswer={()=>
                                             setQuestion({...question,answer:[...question.answer.filter(el=>el!==a)]})
                                         }
@@ -70,8 +77,9 @@ export default ({question, setQuestion}) => {
                                             setAnswer(a);
                                         }}
                                     />
-                                }
-                            })
+                                    }
+                                </div>
+                            )
                         }
                         <input type="button" value="+" onClick={() => {
                             const newAnswer = clearAnswer();

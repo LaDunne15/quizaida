@@ -25,18 +25,18 @@ export default ({question, setQuestions, onClick}) => {
             <ul className="answers">
                 {
                     question.answer.map((a,index3)=><li key={index3} className={`answer ${a.correct?"correct":""}`}>
-                        <h5>{a.text}</h5>
-                            {
-                                a.photo && <Image
-                                    style={{
-                                        objectFit: "cover"
-                                    }}
-                                    src={  typeof a.photo === "string" ? a.photo : URL.createObjectURL(a.photo) }
-                                    alt="Downloaded"
-                                    width={200}
-                                    height={200}
-                                />
-                            }
+                        <span>{a.text}</span>
+                        {
+                            a.photo && <Image
+                                style={{
+                                    objectFit: "cover"
+                                }}
+                                src={  typeof a.photo === "string" ? a.photo : URL.createObjectURL(a.photo) }
+                                alt="Downloaded"
+                                width={150}
+                                height={150}
+                            />
+                        }
                     </li>)
                 }
             </ul>

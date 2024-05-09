@@ -138,6 +138,8 @@
                         flex-direction: row;
                         justify-content: space-between;
                         position: relative;
+                        text-align: center;
+                        font-size: large;
 
                         span {
                             flex: 1;
@@ -149,26 +151,33 @@
 
                     .question-image {
                         width: 100%;
+                        display: inline-flex;
+                        flex-wrap: wrap;
+                        gap: 5px;
+                        justify-content: center;
 
                         img {
-                            width: 100%;
-                            height: 100%;
+                            object-fit: cover;
+                            border: 2px solid variables.$greenDarker;
                         }
                     }
                 }
 
                 .answers {
                     padding: 3px;
-                    display: flex;
-                    flex-direction: column;
+                    display: inline-flex;
+                    flex-wrap: wrap;
                     gap: 3px;
+                    justify-content: center;
 
                     .answer {
-                        padding: 3px;
+                        flex: 1;
+                        padding: 5px;
                         display: flex;
                         flex-direction: column;
-                        gap: 3px;
+                        gap: 5px;
                         position: relative;
+                        align-items: center;
 
                         .answer-data {
                             display: flex;
@@ -181,7 +190,8 @@
                     }
 
                     .correct {
-                        border: 2px dashed variables.$greenDarker;
+                        background-color: variables.$greenDarker;
+                        color: variables.$greenLight;
                     }
                 }
             }

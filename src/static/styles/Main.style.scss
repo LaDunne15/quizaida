@@ -31,6 +31,34 @@
     .hidden {
         display: none;
     }
+
+    .warnings {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        padding: 5px 5px 5px 15px;
+
+        li {
+            &::before {
+                content: "⚠️ ";
+            }
+        }
+    }
+
+    .link {
+        color: variables.$greenDarker;
+        transition: 0.25s;
+        padding-left: 30px;
+
+        &::before {
+            content: "# ";
+            text-decoration: none;
+        }
+
+        &:hover {
+            padding-left: 50px;
+        }
+    }
     
 
     .title {
