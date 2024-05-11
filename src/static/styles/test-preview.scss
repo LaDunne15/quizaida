@@ -124,6 +124,52 @@
             flex: 1;
         }
     }
+
+    .completed-responses {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+
+        li {
+            display: flex;
+            flex-direction: row;
+            border: 2px solid variables.$greenLightDark;
+            padding: 5px;
+            gap: 5px;
+            
+            .result {
+                background-color: variables.$greenDarker;
+                color: variables.$greenLight;
+                width: 60px;
+                height: 60px;
+                text-align: center;
+                align-self: center;
+                padding: 5px;
+                font-size: large;
+                align-content: center;
+            }
+            
+            >div {
+
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+
+                .time {
+                    flex: 1 1 0;
+                    display: inline-flex;
+                    flex-wrap: wrap;
+                    justify-content: space-evenly;
+                    font-size: small;
+                }
+
+                a {
+                    text-align: end;
+                }
+            }
+        }
+    }
 }
 
 

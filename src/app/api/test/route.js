@@ -21,11 +21,16 @@ export async function GET(req) {
         const id = req.nextUrl.searchParams.get("id");
 
         if (id) {
+
+            if (!id.match(/^[0-9a-fA-F]{24}$/)) throw new Error("Invalid ID");
+
             const test = await Test.findById(id).populate({
                 path: 'author'
             }).populate({
                 path: 'question'
             });
+
+            if (!test) throw new Error("Test not found");
 
             const filter = test.rating.filter(i=>i.user.toString() === token.id);
 
@@ -41,12 +46,33 @@ export async function GET(req) {
                 test: id
             });
 
+            
+            const responses = await Response.find({
+                executor: token.id,
+                test: id,
+                status: "Completed"
+            }).populate({
+                path: 'test'
+            }).populate({
+                path: 'executor'
+            }).populate({
+                path: 'answers',
+                populate: {
+                    path: 'question'
+                }
+            }).sort({
+                started: -1
+            });
+
+            
+
             return NextResponse.json({
                 test,
                 isOwner: test.author?test.author._id.toString() === token.id: false, 
                 inProcess: !!response,
                 responseId: response? response._id: null,
                 liked,
+                responses,
                 statusText: "OK"
             },{
                 status: 200

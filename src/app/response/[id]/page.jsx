@@ -146,14 +146,14 @@ export default function Response ({params}) {
     if (isLoading) {
         return (
             <div>
-                Loading...
+                {  message?`Error ${message}`:"Loading..." }
             </div>
         )
     }
 
     return (
         <div className="response">
-            <Link href="/" className="link">Back to responses</Link>
+            <Link href="/response" className="link">Back to responses</Link>
             <div className="test-preview">
                 <div className="test-header">
                     <div className="image">

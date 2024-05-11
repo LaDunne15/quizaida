@@ -21,6 +21,8 @@ export async function GET(req) {
 
         if(id) {
 
+            if (!id.match(/^[0-9a-fA-F]{24}$/)) throw new Error("Invalid ID");
+
             const response = await Response.findById(id).populate({
                 path: 'test',
                 populate: {
@@ -39,6 +41,8 @@ export async function GET(req) {
                     path: 'question'
                 }
             });
+
+            if (!response) throw new Error("Response not found");
             
             return NextResponse.json({
                 response

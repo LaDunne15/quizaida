@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import noImage from "../../../static/icons/no-image.png";
 import rateActive from "../../../static/icons/rate-active.png";
 import rateInactive from "../../../static/icons/rate-inactive.png";
+import { responseService } from "../../../libs/responseService.js";
 
 export default ({params}) => {
 
@@ -46,6 +47,7 @@ export default ({params}) => {
     const [inProcess, setInProcess] = useState(false);
     const [responseId, setResponseId] = useState("");
     const [liked, setLiked] = useState(0);
+    const [responses, setResponses] = useState([]);
 
     useEffect(()=>{
 
@@ -63,7 +65,7 @@ export default ({params}) => {
                 setInProcess(data.inProcess);
                 setResponseId(data.responseId);
                 setLiked(data.liked);
-                console.log(data);
+                setResponses(data.responses);
 
             } catch (err) {
                 setMessage(err.message);
@@ -127,7 +129,7 @@ export default ({params}) => {
     if(isLoading) {
         return (
             <div>
-                Loading...
+                { message? `Error: ${message}`:"Loading..." }
             </div>
         )
     }
@@ -191,6 +193,22 @@ export default ({params}) => {
                     <input type="button" value="Start test" onClick={startTest}/>
                 }
             </div>
+            <h3 className="sub-title">Completed responses</h3>
+            <ul className="completed-responses">
+                {
+                    responses.map(i=><li key={i._id}>
+                        <span className="result">{ responseService.getTotalResult(i).total } %</span>
+                        <div>
+                            <div className="time">
+                                <span> Time spend: { validationService.determineTimeBetween(i.started, i.completed) }</span>
+                                <span> Started { validationService.determineTimePassed(i.started) }</span>
+                                <span> Completed { validationService.determineTimePassed(i.completed) }</span>
+                            </div>
+                            <Link href={`/response/${i._id}`} className="link">Details</Link>
+                        </div>
+                    </li>)
+                }
+            </ul>
             {
                 message
             }
