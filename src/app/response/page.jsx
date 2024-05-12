@@ -17,8 +17,11 @@ export default function Response () {
         started: "",
         completed: ""
     }]);
+
+    const [filteredResponses, setFilteredResponses] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [message, setMessage] = useState("");
+    const [filter, setFilter] = useState("In process");
 
     useEffect(()=>{
 
@@ -29,6 +32,7 @@ export default function Response () {
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.statusText);
                 setResponses(data.response);
+                setFilteredResponses(filterResponses(data.response, "In process"));
                 setIsLoading(false);
             } catch (err) {
                 setMessage(err.message);
@@ -38,23 +42,59 @@ export default function Response () {
         fetchData();
     },[]);
 
+    const filterResponses = (responses, filter) => {
+        switch (filter) {
+            case "Completed":
+                return responses.filter(i=>i.status=="Completed");
+            case "In process":
+                return responses.filter(i=>i.status=="In process");
+            case "All":
+                return responses;
+            default:
+                return responses;
+        }
+    }
+
+    useEffect(()=>{
+
+        setFilteredResponses(filterResponses(responses, filter));
+        
+    }, [filter]);
+
     if(isLoading) return <div>Loading...</div>;
 
 
     return (
         <div className="my-responses">
             <h1 className="title">My Responses</h1>
+            <div className="filter">
+                <p onClick={() => setFilter("In process")}
+                    className={filter=="In process"?"active":null}
+                >
+                    In process
+                </p>
+                <p onClick={() => setFilter("Completed")}
+                    className={filter=="Completed"?"active":null}
+                >
+                    Completed
+                </p>
+                <p onClick={() => setFilter("All")}
+                    className={filter=="All"?"active":null}
+                >
+                    All
+                </p>
+            </div>
             <ul className="response-list">
                 {
-                    responses.map( i => <li key={i._id}>
+                    filteredResponses.map( i => <li key={i._id}>
                         <Image
                             style={{
                                 objectFit: "cover"
                             }}
                             src={ i.test.mainImage?i.test.mainImage:noImage }
                             alt="Downloaded"
-                            width={150}
-                            height={150}
+                            width={100}
+                            height={100}
                         />
                         <div className="data">
                             <span className="theme">{i.test.theme}</span>
@@ -76,6 +116,11 @@ export default function Response () {
                     </li>)
                 }
             </ul>
+            {
+                filteredResponses.length==0 && <div>
+                    No responses
+                </div>
+            }
             {
                 message
             }

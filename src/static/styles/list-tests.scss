@@ -1,6 +1,6 @@
 @use 'variables';
 
-.my-tests, .my-responses {
+.my-tests, .my-responses, main {
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -11,10 +11,25 @@
         
     }
 
+    .filter {
+        display: inline-flex;
+        flex-wrap: wrap;
+
+         >p {
+            flex: 1 1 0;
+            padding: 5px;
+            text-align: center;
+         }
+
+         .active {
+            background-color: variables.$greenDarker;
+            color: variables.$greenLight;
+         }
+    }
+
     .test-list, .response-list {
         display: inline-flex;
         flex-wrap: wrap;
-        flex-direction: row;
         gap: 10px;
         padding: 5px;
 
@@ -38,7 +53,7 @@
                 flex-direction: column;
                 gap: 5px;
                 width: 100%;
-                min-width: 200px;
+                min-width: 150px;
                 justify-content: space-between;
                 padding: 7px;
 
@@ -59,6 +74,15 @@
                         gap: 3px;
                         flex: 1 1 0;
                         justify-content: center;
+                        font-size: small;
+                        
+                        span {
+                            align-content: center;
+                        }
+
+                        &:nth-of-type(1) {
+                            text-align: center;
+                        }
                     }
                 }
 
@@ -98,5 +122,17 @@
                 }
             }
         }
+    }
+}
+
+@media screen and (max-width: 426px) {
+
+    .test-list, .response-list {
+        >li {
+            >img {
+                width: 100px;
+                height: 100px;
+            }   
+        }    
     }
 }

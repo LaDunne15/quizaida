@@ -1,6 +1,8 @@
 import Image from "next/image"
 
 import noImage from "../static/icons/no-image.png";
+import question from "../static/icons/_question.png";
+import time from "../static/icons/time.png";
 import rateActive from "../static/icons/rate-active.png";
 import Link from "next/link";
 import { validationService } from "../libs/validationService";
@@ -17,13 +19,22 @@ export default ({tests}) => {
                             }}
                             src={ i.mainImage?i.mainImage:noImage }
                             alt="Downloaded"
-                            width={150}
-                            height={150}
+                            width={120}
+                            height={120}
                         />
                         <div className="data">
                             <span className="theme">{i.theme}</span>
                             <ul>
-                                <li>{i.question.length} questions</li>
+                                <li>
+                                    <span>{i.question.length}</span>
+                                    <Image src={ question } alt="Downloaded" width={20} height={20}/>
+                                </li>
+                                { 
+                                    typeof i.completedTimes === "number" && <li> 
+                                        <span>{ i.completedTimes }</span>
+                                        <Image src={ time } alt="Downloaded" width={20} height={20}/>
+                                    </li>
+                                }
                                 <li>
                                     <span>{i.totalrating}</span>
                                     <Image src={rateActive} style={{

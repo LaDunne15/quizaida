@@ -1,0 +1,52 @@
+@use 'variables';
+
+main {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .search {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px;
+        min-height: 100vh;
+        transition: 1s;
+
+        >span {
+            text-align: center;
+            font-size: xx-large;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+
+            input[type="search"] {
+                flex: 1;
+            }
+
+            input[type="submit"] {
+                min-width: 200px;
+                align-self: center;
+            }
+        }
+    }
+}
+
+
+@media screen and (min-width: 426px) {
+    main {
+        .search {
+            form {
+                flex-direction: row;
+                
+                input[type="submit"] {
+                    max-width: none;
+                }
+            }
+        }
+    }
+}

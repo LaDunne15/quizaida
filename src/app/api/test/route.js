@@ -79,18 +79,39 @@ export async function GET(req) {
             });
             
         } else {
+
             const tests = await Test.find({
                 type: "PUBLIC" 
             }).populate({
                 path: 'author',
                 model: User
+            }).sort({
+                created: -1
             });
+
+            const tests2 = await Promise.all( 
+                tests.map( async (i)=>{
+
+                    const completedTests = await Response.find({
+                        status: "Completed",
+                        test: i._id
+                    });
+
+                    return {
+                        ...i.toObject(),
+                        completedTimes: completedTests.length
+                    }
+                })
+            );
+
             return NextResponse.json({
                 tests,
+                tests2,
                 statusText: "OK"
             },{
                 status: 200
             });
+
         }
     } catch (err) {
         return NextResponse.json({

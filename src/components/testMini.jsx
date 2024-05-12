@@ -4,8 +4,6 @@ import Link from "next/link";
 
 export default function TestMini({data}) {
 
-    console.log(data);
-
     return (
         <div>
             <p>{data.theme}</p>

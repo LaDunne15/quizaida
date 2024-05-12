@@ -9,7 +9,7 @@ class ResponseService {
         return {
             ...response, 
             answers: result,
-            total: ( result.map(i=>i.rating).reduce((acc,val) => acc + val) / response.answers.length * 100 ).toFixed(0)
+            total: result.length ?( result.map(i=>i.rating).reduce((acc,val) => acc + val) / response.answers.length * 100 ).toFixed(0):0
         }
     }
 

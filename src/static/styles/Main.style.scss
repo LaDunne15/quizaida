@@ -6,6 +6,7 @@
 @import './test-preview.scss';
 @import "./list-tests.scss";
 @import "./response.scss";
+@import "./main.scss";
 
 * {
     font-family: 'Nokia 3410', sans-serif;
@@ -103,7 +104,7 @@
         padding: 3px;
     }
 
-    input[type="text"], input[type="number"], input[type="password"], textarea {
+    input[type="text"], input[type="number"], input[type="password"], input[type="search"], textarea {
         background: none;
         border: 2px solid variables.$greenDarker;
         font-weight: 700;
