@@ -210,6 +210,9 @@ export default ({params}) => {
                 }
             </ul>
             {
+                responses.length == 0 && <p className="no-responses">No responses yet</p>
+            }
+            {
                 message
             }
         </div>

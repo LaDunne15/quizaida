@@ -255,6 +255,16 @@
                     color: variables.$greenLight;
                 }
             }
+
+            input[type="button"] {
+                text-decoration: none;
+                max-width: 100px;
+                align-self: center;
+            }
         }
+    }
+
+    .test-completed {
+        text-align: center;
     }
 }

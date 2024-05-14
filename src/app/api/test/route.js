@@ -89,24 +89,29 @@ export async function GET(req) {
                 created: -1
             });
 
-            const tests2 = await Promise.all( 
-                tests.map( async (i)=>{
+            const top10Completed = await Test.find({
+                type: "PUBLIC",
+            }).populate({
+                path: 'author',
+                model: User
+            }).sort({
+                completedTimes: -1
+            }).limit(10);
 
-                    const completedTests = await Response.find({
-                        status: "Completed",
-                        test: i._id
-                    });
+            const top10Rated = await Test.find({
+                type: "PUBLIC",
+            }).populate({
+                path: 'author',
+                model: User
+            }).sort({
+                totalRating: -1
+            }).limit(10);
 
-                    return {
-                        ...i.toObject(),
-                        completedTimes: completedTests.length
-                    }
-                })
-            );
 
             return NextResponse.json({
                 tests,
-                tests2,
+                top10Completed,
+                top10Rated,
                 statusText: "OK"
             },{
                 status: 200

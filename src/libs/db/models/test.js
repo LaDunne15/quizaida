@@ -42,6 +42,10 @@ const testSchema = mongoose.Schema({
     }, 
     endTime: {
         type: Date
+    },
+    completedTimes: {
+        type: Number,
+        default: 0
     }
 }, {
     toJSON: {

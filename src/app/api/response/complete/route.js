@@ -75,6 +75,7 @@ export async function GET(req) {
 
 export async function POST(req) {
     try {
+
         const token = await verifyJwtToken(req.cookies.get('token')?.value);
         
         if (!token) throw new Error("Unauthorized");
@@ -104,6 +105,18 @@ export async function POST(req) {
                 path: 'question'
             }
         });
+
+        const test = await Test.findById(response.test.id);
+
+        console.log(test);
+
+        if (!test.completedTimes) test.completedTimes = 0;
+
+        test.completedTimes = test.completedTimes + 1;
+
+        await test.save();
+
+        console.log(test);
 
         const result = response.answers.sort((a,b)=>{return (a.orderNumber-b.orderNumber);}).map(i=>{
             var _res;

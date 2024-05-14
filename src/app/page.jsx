@@ -1,15 +1,12 @@
 "use client";
-import { useAuth } from "./../hooks/useAuth";
-import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import TestMini from "../components/testMini";
 import TestList from "../components/test-list";
 
 export default function Home() {
 
   const [isLoading, setIsLoading] = useState(true);
-  const [tests, setTests] = useState([]);
+  const [top10Completed, setTop10Completed] = useState([]);
+  const [top10Rated, setTop10Rated] = useState([]);
   const [message, setMessage] = useState("");
   const [searchString, setSearchString] = useState("");
 
@@ -26,7 +23,9 @@ export default function Home() {
         if (!response.ok) throw new Error(data.statusText);
 
         setIsLoading(false);
-        setTests(data.tests2);
+
+        setTop10Completed(data.top10Completed);
+        setTop10Rated(data.top10Rated);
 
       } catch(err) {
         setMessage(err.message);
@@ -71,11 +70,11 @@ export default function Home() {
         		searchedResults.length==0 && <>
           		<section className="most-popular">
             		<h2 className="sub-title">Top 10 most popular</h2>
-            		<TestList tests={ tests.sort((a,b) => b.completedTimes - a.completedTimes).slice(0,10) }/>
+            		<TestList tests={ top10Completed }/>
           		</section>
           		<section className="most-rated">
         			<h2 className="sub-title">Top 10 most rated</h2>
-            		<TestList tests={ tests.sort((a,b) => b.totalrating - a.totalrating).slice(0,10) }/>
+            		<TestList tests={ top10Rated}/>
           		</section></>
       		}
       		{

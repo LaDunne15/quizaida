@@ -54,6 +54,7 @@ export default function Response ({params}) {
     });
     const [message, setMessage] = useState("");
     const [focusQuestion, setFocusQuestion] = useState(0);
+    const [testCompleted, setTestCompleted] = useState(false);
 
     useEffect(()=>{
 
@@ -321,19 +322,27 @@ export default function Response ({params}) {
                                     </li>)
                                 }
                                 </ul>
-                                <input type="button" value=">"
+                                <input type="button" value="Next >"
                                     onClick={
                                         ()=>{
-                                            const next = response.answers
+                                            
+                                            const nextQuestions = response.answers
                                             .filter(i=>i.answers.length==0)
-                                            .filter(i=>i.orderNumber>focusQuestion)[0]?.orderNumber;
-                                            if (next) {
-                                                setFocusQuestion(next);
+                                            .filter(i=>i.orderNumber>focusQuestion);
+
+                                            if(nextQuestions.length==0) {
+                                                setTestCompleted(true);
+                                            }
+
+                                            const nextIndex = nextQuestions[0]?.orderNumber;
+                                            if (nextIndex) {
+                                                setFocusQuestion(nextIndex);
                                             } else {
                                                 const start = response.answers
                                                 .filter(i=>i.answers.length==0)[0]?.orderNumber;
                                                 setFocusQuestion(start);
                                             }
+
                                         }
                                     }
                                 />
@@ -342,6 +351,9 @@ export default function Response ({params}) {
                     }
                     {
                         message
+                    }
+                    {
+                        testCompleted && <span className="test-completed">You answered all questions. Click "Complete" or check your answers</span>
                     }
                     <input type="submit" value="Complete"/>
                 </form>
